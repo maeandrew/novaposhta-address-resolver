@@ -31,6 +31,30 @@ final class UkrainianAddressParserTest extends TestCase
         self::assertSame('вулиця соборна 33', $parsed->streetAddress);
     }
 
+    public function testItParsesBareNumberAfterCity(): void
+    {
+        $parsed = (new UkrainianAddressParser())->parse(AddressInput::fromText('Київ 133'));
+
+        self::assertSame('київ', $parsed->city);
+        self::assertSame(WarehouseType::UNKNOWN, $parsed->warehouseType);
+        self::assertSame(133, $parsed->warehouseNumber);
+    }
+
+    public function testItRecognizesRussianBranchAndPostomatWords(): void
+    {
+        $parser = new UkrainianAddressParser();
+
+        $branch = $parser->parse(AddressInput::fromText('Киев, отделение №12'));
+        $postomat = $parser->parse(AddressInput::fromText('Львов, постамат 12345'));
+
+        self::assertSame('киев', $branch->city);
+        self::assertSame(WarehouseType::BRANCH, $branch->warehouseType);
+        self::assertSame(12, $branch->warehouseNumber);
+        self::assertSame('львов', $postomat->city);
+        self::assertSame(WarehouseType::POSTOMAT, $postomat->warehouseType);
+        self::assertSame(12345, $postomat->warehouseNumber);
+    }
+
     public function testCustomFieldsCanBeParsedWithoutRawText(): void
     {
         $parsed = (new UkrainianAddressParser())->parse(new AddressInput(

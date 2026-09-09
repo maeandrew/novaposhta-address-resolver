@@ -1,5 +1,7 @@
 # Security policy
 
+[English](SECURITY.md) · [Українська](SECURITY.uk.md)
+
 Do not report security vulnerabilities in public issues. Send a private report
 to the maintainer account configured for the repository, including:
 

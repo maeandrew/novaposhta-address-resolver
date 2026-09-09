@@ -10,6 +10,15 @@
       "is_active": true
     },
     {
+      "ref": "fixture-kyiv-133",
+      "settlement_ref": "fixture-kyiv",
+      "number": 133,
+      "name": "Відділення №133",
+      "address": "вулиця Прикладна, 13",
+      "type": "branch",
+      "is_active": true
+    },
+    {
       "ref": "fixture-kyiv-12",
       "settlement_ref": "fixture-kyiv",
       "number": 12,

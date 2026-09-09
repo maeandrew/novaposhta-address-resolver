@@ -1,0 +1,44 @@
+{
+    "name": "maeandrew/novaposhta-address-resolver-openai",
+    "description": "Optional OpenAI Responses API adapter for the Nova Poshta address resolver",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "maeandrew/novaposhta-address-resolver": "^0.2",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.1 || ^2.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "nyholm/psr7": "^1.8",
+        "phpstan/phpstan": "^1.12",
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\OpenAI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\OpenAI\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "format:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff --ansi",
+        "analyse": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon",
+        "quality": [
+            "@format:check",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

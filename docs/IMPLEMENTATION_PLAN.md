@@ -1,5 +1,7 @@
 # Implementation plan
 
+[English](IMPLEMENTATION_PLAN.md) · [Українська](uk/IMPLEMENTATION_PLAN.md)
+
 ## 1. Product definition
 
 Implement a standalone address-resolution engine for Nova Poshta data. Input is
@@ -36,18 +38,12 @@ The initial development repository may be a monorepo, but the package boundaries
 must be clean enough to publish separately later:
 
 ```text
+src/                         # framework-free core while the API stabilizes
+tests/
 packages/
-  core/
+  openai/
     composer.json
     src/
-      Contracts/
-      DTO/
-      Enums/
-      Exceptions/
-      Parsing/
-      Matching/
-      AI/
-      AddressResolver.php
     tests/
   laravel/
     composer.json
@@ -61,7 +57,6 @@ packages/
     tests/
   adapters/
     ready-sdk/
-    openai/
     anthropic/
     gemini/
     bedrock/
@@ -409,7 +404,7 @@ addresses may be required.
 
 - structured AI contract;
 - fake AI provider;
-- one real provider adapter;
+- one real provider adapter (`packages/openai`, PSR HTTP based);
 - fallback and validation tests;
 - PII redaction.
 

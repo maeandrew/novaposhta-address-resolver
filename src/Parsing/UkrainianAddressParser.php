@@ -30,7 +30,7 @@ final class UkrainianAddressParser implements AddressParser
         $warehouseType = $this->detectWarehouseType($source, $input->warehouse);
         $warehouseNumber = $input->warehouseNumber ?? $this->detectWarehouseNumber($source, $input->warehouse);
         $warehouseText = $this->detectWarehouseText($source, $input->warehouse, $warehouseType, $warehouseNumber);
-        $city = $this->detectCity($source, $input->city, $warehouseType);
+        $city = $this->detectCity($source, $input->city, $warehouseType, $warehouseNumber);
         $region = $this->normalizeNullable($input->region ?? $this->detectLabeledValue($source, 'region'));
         $district = $this->normalizeNullable($input->district ?? $this->detectLabeledValue($source, 'district'));
         $streetAddress = $this->detectStreetAddress($source, $city, $warehouseType);
@@ -79,15 +79,21 @@ final class UkrainianAddressParser implements AddressParser
     {
         $value = trim($source . ' ' . (string) $warehouse);
 
-        if (preg_match('/\b(?:поштомат\w*|postomat)\b/iu', $value) === 1) {
+        if (preg_match('/\b(?:поштомат\w*|постамат\w*|постомат\w*|postomat)\b/iu', $value) === 1) {
             return WarehouseType::POSTOMAT;
         }
 
-        if (preg_match('/\bпункт(?:\s+приймання[-\s]видачі)?\b/iu', $value) === 1) {
+        if (preg_match(
+            '/(?:\bпункт(?:\s+(?:приймання|при(?:й|и)мання|прийому|приёма)[-\s]?(?:видачі|выдачи))?\b|\bпвз\b|\bсамовивоз\w*\b|\bсамовывоз\w*\b)/iu',
+            $value,
+        ) === 1) {
             return WarehouseType::PICKUP;
         }
 
-        if (preg_match('/\b(?:відділен\w*|відд\.?|нп|branch)\b/iu', $value) === 1) {
+        if (preg_match(
+            '/(?:\bвідділен\w*\b|\bвідд\.?\b|\bотделен\w*\b|\bотд\.?\b|\bнп\b|\bпвз\b|\bbranch\b|\bфілі\w*\b|\bфилиал\w*\b|\bнова\s+пошта\b|\bновая\s+почта\b)/iu',
+            $value,
+        ) === 1) {
             return WarehouseType::BRANCH;
         }
 
@@ -99,13 +105,18 @@ final class UkrainianAddressParser implements AddressParser
         $value = trim($source . ' ' . (string) $warehouse);
         $patterns = [
             '/(?:№|#|номер)\s*(\d+)/iu',
-            '/(?:відділен\w*|відд\.?|поштомат\w*|пункт\w*|нп|branch)\s*(?:№|#|номер)?\s*(\d+)/iu',
+            '/(?:відділен\w*|відд\.?|отделен\w*|отд\.?|поштомат\w*|постамат\w*|постомат\w*|пункт\w*|пвз|нп|branch|нова\s+пошта|новая\s+почта)\s*(?:№|#|номер|no\.?|n\.?|номер)?\s*(\d+)/iu',
         ];
 
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $value, $matches) === 1) {
                 return (int) $matches[1];
             }
+        }
+
+        if (!str_contains($source, ',') && !str_contains($source, ';')
+            && preg_match('/(?:^|\s)(\d{1,6})\s*$/u', $source, $matches) === 1) {
+            return (int) $matches[1];
         }
 
         return null;
@@ -122,12 +133,16 @@ final class UkrainianAddressParser implements AddressParser
         }
 
         if ($type === WarehouseType::PICKUP
-            && preg_match('/\bпункт(?:\s+приймання[-\s]видачі)?\b/iu', $source, $matches) === 1) {
+            && preg_match(
+                '/(?:\bпункт(?:\s+(?:приймання|при(?:й|и)мання|прийому|приёма)[-\s]?(?:видачі|выдачи))?\b|\bпвз\b|\bсамовивоз\w*\b|\bсамовывоз\w*\b)/iu',
+                $source,
+                $matches,
+            ) === 1) {
             return trim($matches[0]);
         }
 
         if (preg_match(
-            '/\b(?:відділен\w*|відд\.?|поштомат\w*|нп|branch)\b(?:\s*(?:№|#|номер)?\s*\d+)?/iu',
+            '/(?:\bвідділен\w*\b|\bвідд\.?\b|\bотделен\w*\b|\bотд\.?\b|\bпоштомат\w*\b|\bпостамат\w*\b|\bпостомат\w*\b|\bнп\b|\bbranch\b|\bнова\s+пошта\b|\bновая\s+почта\b)(?:\s*(?:№|#|номер|no\.?|n\.?)?\s*\d+)?/iu',
             $source,
             $matches,
         ) === 1) {
@@ -137,8 +152,12 @@ final class UkrainianAddressParser implements AddressParser
         return $number === null ? null : (string) $number;
     }
 
-    private function detectCity(string $source, ?string $explicitCity, WarehouseType $warehouseType): string
-    {
+    private function detectCity(
+        string $source,
+        ?string $explicitCity,
+        WarehouseType $warehouseType,
+        ?int $warehouseNumber,
+    ): string {
         if ($explicitCity !== null && trim($explicitCity) !== '') {
             return $this->normalizeCity(trim($explicitCity));
         }
@@ -150,7 +169,7 @@ final class UkrainianAddressParser implements AddressParser
         $cityPart = preg_split('/[,;]+/u', $source, 2)[0] ?? $source;
 
         if (!str_contains($source, ',') && !str_contains($source, ';')) {
-            $marker = '(?:відділен\w*|відд\.?|поштомат\w*|пункт\w*|нп|branch)';
+            $marker = '(?:відділен\w*|відд\.?|отделен\w*|отд\.?|поштомат\w*|постамат\w*|постомат\w*|пункт\w*|пвз|нп|branch|нова\s+пошта|новая\s+почта|філі\w*|филиал\w*)';
             $parts = preg_split('/\b' . $marker . '\b/iu', $cityPart, 2);
 
             if (is_array($parts) && isset($parts[0]) && trim($parts[0]) !== '') {
@@ -160,6 +179,10 @@ final class UkrainianAddressParser implements AddressParser
 
         if ($warehouseType === WarehouseType::PICKUP && str_contains($source, ',')) {
             $cityPart = (preg_split('/[,;]+/u', $source, 2)[0] ?? $source);
+        }
+
+        if ($warehouseNumber !== null && !str_contains($cityPart, ',') && !str_contains($cityPart, ';')) {
+            $cityPart = (string) preg_replace('/\s+\d{1,6}\s*$/u', '', $cityPart);
         }
 
         return $this->normalizeCity($cityPart);
@@ -188,7 +211,7 @@ final class UkrainianAddressParser implements AddressParser
         }
 
         if (preg_match(
-            '/\b(?:вул\.?|вулиця|просп\.?|проспект|пров\.?|провулок|пл\.?|площа)\b.*$/iu',
+            '/\b(?:вул\.?|вулиця|ул\.?|улица|просп\.?|проспект|пров\.?|провулок|пер\.?|переулок|пл\.?|площа|площадь)\b.*$/iu',
             $source,
             $matches,
         ) === 1) {
@@ -216,7 +239,7 @@ final class UkrainianAddressParser implements AddressParser
     private function normalizeCity(string $city): string
     {
         $city = trim($city);
-        $city = (string) preg_replace('/^\s*(?:м\.?|місто)\s+/iu', '', $city);
+        $city = (string) preg_replace('/^\s*(?:м\.?|місто|г\.?|город|с\.?|село|смт\.?|пгт\.?)\s+/iu', '', $city);
         $city = (string) preg_replace('/\s+(?:область|обл\.?)\s*$/iu', '', $city);
 
         return $this->normalizer->normalize($city);
@@ -245,7 +268,7 @@ final class UkrainianAddressParser implements AddressParser
     private function looksLikeStreet(string $value): bool
     {
         return preg_match(
-            '/\b(?:вул\.?|вулиця|просп\.?|проспект|пров\.?|провулок|пл\.?|площа)\b/iu',
+            '/\b(?:вул\.?|вулиця|ул\.?|улица|просп\.?|проспект|пров\.?|провулок|пер\.?|переулок|пл\.?|площа|площадь)\b/iu',
             $value,
         ) === 1;
     }

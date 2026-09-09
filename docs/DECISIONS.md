@@ -1,5 +1,7 @@
 # Architecture decisions
 
+[English](DECISIONS.md) · [Українська](uk/DECISIONS.md)
+
 This file records decisions that should remain stable unless a later change is
 documented with its motivation and migration impact.
 
@@ -65,3 +67,13 @@ and uses the `MaeAndrew\\NovaPoshtaAddressResolver` PSR-4 namespace.
 
 **Reason:** the package identity should be attributable to its public maintainer
 while keeping Nova Poshta integration concepts inside the package namespace.
+
+## D009 — PSR HTTP for the first AI adapter
+
+The first real AI adapter is an optional OpenAI Responses API package under
+`packages/openai`. It depends on PSR HTTP interfaces and accepts the host
+application's client and factories instead of requiring a vendor SDK.
+
+**Reason:** the adapter remains small, testable offline, and compatible with
+different HTTP clients while the core keeps zero network dependencies. The
+package can later add a separate SDK adapter without changing core contracts.

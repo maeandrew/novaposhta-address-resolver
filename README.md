@@ -142,10 +142,44 @@ returns ranked candidates while keeping the result reviewable.
 
 ## AI is optional
 
-The deterministic pipeline works without an AI key. AI adapters and structured
-fallbacks belong to the later M2 milestone. When added, an AI suggestion may
-only rank provider candidates; it can never create or persist a settlement or
-warehouse reference.
+The deterministic pipeline works without an AI key. The core AI contracts and a
+fake provider are included in the core package. An AI suggestion may only rank
+provider candidates; it can never create or persist a settlement or warehouse
+reference.
+
+The optional OpenAI adapter uses the Responses API and structured JSON output:
+
+```bash
+# after publishing the adapter package
+composer require maeandrew/novaposhta-address-resolver-openai
+```
+
+During monorepo development, install its local dependencies with
+`ddev exec bash scripts/install-openai.sh`. The adapter is kept in a separate
+package so the core's Composer install remains small.
+
+It accepts PSR HTTP client and factory implementations from the host
+application, so the core and adapter remain independent of a particular HTTP
+client. The adapter is wired through `StructuredAddressAiInterpreter`:
+
+```php
+use MaeAndrew\NovaPoshtaAddressResolver\AI\StructuredAddressAiInterpreter;
+use MaeAndrew\NovaPoshtaAddressResolver\OpenAI\OpenAiStructuredAiProvider;
+
+$structuredProvider = new OpenAiStructuredAiProvider(
+    $httpClient,
+    $requestFactory,
+    $streamFactory,
+    $_ENV['OPENAI_API_KEY'],
+);
+$resolver = new AddressResolver(
+    $locationProvider,
+    aiInterpreter: new StructuredAddressAiInterpreter($structuredProvider),
+);
+```
+
+The adapter is optional and its tests use a fake HTTP client; CI never calls an
+AI endpoint.
 
 ## Security and limitations
 
@@ -161,7 +195,8 @@ warehouse reference.
 
 ## Development
 
-This repository includes a DDEV configuration for offline development:
+For consistent local development, this repository includes a DDEV configuration
+with PHP and Composer:
 
 ```bash
 ddev start

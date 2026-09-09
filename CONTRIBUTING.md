@@ -1,5 +1,7 @@
 # Contributing
 
+[English](CONTRIBUTING.md) · [Українська](CONTRIBUTING.uk.md)
+
 This project welcomes focused pull requests that preserve the framework-free
 core and its safety guarantees.
 

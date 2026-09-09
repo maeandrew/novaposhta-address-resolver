@@ -18,6 +18,33 @@
     }
   },
   {
+    "id": "bare_branch_number",
+    "input": "Київ 133",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kyiv",
+      "warehouse_ref": "fixture-kyiv-133"
+    }
+  },
+  {
+    "id": "russian_branch_words",
+    "input": "Киев, отделение №12",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kyiv",
+      "warehouse_ref": "fixture-kyiv-12"
+    }
+  },
+  {
+    "id": "russian_postomat_word",
+    "input": "Львов, постамат 12345",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-lviv",
+      "warehouse_ref": "fixture-lviv-12345"
+    }
+  },
+  {
     "id": "postomat",
     "input": "Львів, поштомат №12345",
     "expected": {

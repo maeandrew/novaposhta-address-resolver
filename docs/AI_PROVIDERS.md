@@ -1,5 +1,7 @@
 # AI provider architecture
 
+[English](AI_PROVIDERS.md) · [Українська](uk/AI_PROVIDERS.md)
+
 ## Principle
 
 The resolver must work without AI. AI is a replaceable service used only when
@@ -36,12 +38,25 @@ address task.
 Each adapter is installed only when needed:
 
 ```text
-novaposhta-resolver-openai
+maeandrew/novaposhta-address-resolver-openai
 novaposhta-resolver-anthropic
 novaposhta-resolver-gemini
 novaposhta-resolver-bedrock
 novaposhta-resolver-ollama
 ```
+
+The repository includes an optional OpenAI Responses API adapter. Install it
+from Packagist after its separate package publication with:
+
+```bash
+composer require maeandrew/novaposhta-address-resolver-openai
+```
+
+For monorepo development, run `ddev exec bash scripts/install-openai.sh`.
+
+`OpenAiStructuredAiProvider` depends only on PSR HTTP interfaces. The host
+application supplies the HTTP client, request factory, and stream factory, then
+passes the provider to `StructuredAddressAiInterpreter`.
 
 An adapter may use the vendor's official PHP SDK or a PSR-18 HTTP client. No
 adapter type may appear in a core DTO or interface.

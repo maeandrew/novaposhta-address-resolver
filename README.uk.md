@@ -7,7 +7,7 @@
 
 Проєкт навмисно розділений на ядро без фреймворків та опційні адаптери.
 Застосунок може підключити готовий SDK Нової пошти, власний HTTP-клієнт,
-детерміноване зіставлення або один із майбутніх AI-провайдерів.
+детерміноване зіставлення або один із доступних AI-провайдерів.
 
 > Неофіційний community-проєкт. Він не пов’язаний із компанією «Нова пошта».
 
@@ -61,7 +61,7 @@ if ($result->isResolved()) {
     $warehouseRef = $result->warehouse?->ref;
 } elseif ($result->needsReview()) {
     foreach ($result->candidates as $candidate) {
-        // Покажіть кандидатів спеціалісту й зберігайте лише після його вибору.
+        // Покажіть фахівцеві запропоновані варіанти й збережіть лише після підтвердження.
     }
 }
 
@@ -139,10 +139,42 @@ $resolver = new AddressResolver(
 
 ## AI — опційний
 
-Детермінований pipeline працює без AI-ключа. AI-адаптери та fallback-ланцюжки
-належать до майбутнього milestone M2. AI може ранжувати лише кандидатів,
-отриманих від provider-а, але не може створювати чи зберігати reference
-населеного пункту або відділення.
+Детермінований pipeline працює без AI-ключа. Контракти AI та fake provider уже
+є в ядрі. AI може ранжувати лише кандидатів, отриманих від provider-а, але не
+може створювати чи зберігати reference населеного пункту або відділення.
+
+Опційний OpenAI adapter використовує Responses API та структурований JSON:
+
+```bash
+# після публікації окремого adapter package
+composer require maeandrew/novaposhta-address-resolver-openai
+```
+
+Під час розробки monorepo встановіть його локальні залежності командою
+`ddev exec bash scripts/install-openai.sh`. Адаптер винесений в
+окремий package, щоб Composer-встановлення ядра залишалося компактним.
+
+Адаптер приймає PSR HTTP client і factory від host-застосунку, тому ядро та
+адаптер не залежать від конкретного HTTP-клієнта:
+
+```php
+use MaeAndrew\NovaPoshtaAddressResolver\AI\StructuredAddressAiInterpreter;
+use MaeAndrew\NovaPoshtaAddressResolver\OpenAI\OpenAiStructuredAiProvider;
+
+$structuredProvider = new OpenAiStructuredAiProvider(
+    $httpClient,
+    $requestFactory,
+    $streamFactory,
+    $_ENV['OPENAI_API_KEY'],
+);
+$resolver = new AddressResolver(
+    $locationProvider,
+    aiInterpreter: new StructuredAddressAiInterpreter($structuredProvider),
+);
+```
+
+Адаптер опційний, а його тести використовують fake HTTP client; CI не робить
+запитів до AI endpoint.
 
 ## Безпека та обмеження
 
@@ -159,7 +191,8 @@ $resolver = new AddressResolver(
 
 ## Розробка
 
-У репозиторії є DDEV-конфігурація для офлайн-розробки:
+Для узгодженої локальної розробки в репозиторії є DDEV-конфігурація з PHP та
+Composer:
 
 ```bash
 ddev start
@@ -177,6 +210,7 @@ Quality-команда запускає PHP CS Fixer, PHPStan і повний PH
 - [Архітектурні рішення українською](docs/uk/DECISIONS.md)
 - [Синтетичні приклади українською](examples/README.uk.md)
 - [Англійський індекс документації](docs/README.md)
+- [Український індекс документації](docs/README.uk.md)
 
 ## Ліцензія
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MaeAndrew\NovaPoshtaAddressResolver;
 
+use MaeAndrew\NovaPoshtaAddressResolver\AI\Contracts\AddressAiInterpreter;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\AddressParser;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\LocationProvider;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\MatchingStrategy;
@@ -38,6 +39,7 @@ final class AddressResolver
         ?AddressParser $parser = null,
         ?MatchingStrategy $matchingStrategy = null,
         ?ResolutionPolicy $policy = null,
+        private readonly ?AddressAiInterpreter $aiInterpreter = null,
     ) {
         $this->parser = $parser ?? new UkrainianAddressParser();
         $this->matchingStrategy = $matchingStrategy ?? new BalancedMatchingStrategy();
@@ -45,6 +47,20 @@ final class AddressResolver
     }
 
     public function resolve(AddressInput $input): ResolutionResult
+    {
+        $deterministic = $this->resolveDeterministic($input);
+
+        if ($this->aiInterpreter === null
+            || $deterministic->isResolved()
+            || $deterministic->status === ResolutionStatus::PROVIDER_ERROR
+            || $deterministic->status === ResolutionStatus::INVALID_INPUT) {
+            return $deterministic;
+        }
+
+        return $this->resolveWithAi($input, $deterministic);
+    }
+
+    private function resolveDeterministic(AddressInput $input): ResolutionResult
     {
         $parsed = $this->parser->parse($input);
 
@@ -240,6 +256,152 @@ final class AddressResolver
                 $providerName,
             );
         }
+    }
+
+    private function resolveWithAi(AddressInput $input, ResolutionResult $deterministic): ResolutionResult
+    {
+        $aiInterpreter = $this->aiInterpreter;
+        if ($aiInterpreter === null) {
+            return $deterministic;
+        }
+
+        try {
+            $hints = $aiInterpreter->parse($input);
+        } catch (Throwable $exception) {
+            return $this->withDiagnostic($deterministic, new Diagnostic(
+                'ai_failure',
+                'The configured AI interpreter failed; the deterministic result was retained.',
+                'warning',
+                ['exception' => $exception::class],
+            ));
+        }
+
+        if (!$hints->isUsable()) {
+            return $this->withDiagnostic($deterministic, new Diagnostic(
+                'ai_low_confidence',
+                'AI hints did not reach the minimum confidence required for a retry.',
+                'info',
+                ['confidence' => $hints->confidence],
+            ));
+        }
+
+        $aiResult = $this->resolveDeterministic($hints->toAddressInput($input));
+        $base = $this->preferAiResult($deterministic, $aiResult);
+
+        if ($base->candidates === [] || $base->settlement === null) {
+            return $this->withDiagnostic($base, new Diagnostic(
+                'ai_parse_applied',
+                'AI address hints were validated through the deterministic provider pipeline.',
+                'info',
+            ));
+        }
+
+        try {
+            $ranking = $aiInterpreter->rank($input, $base->candidates);
+        } catch (Throwable $exception) {
+            return $this->withDiagnostic($base, new Diagnostic(
+                'ai_failure',
+                'The configured AI ranker failed; the deterministic result was retained.',
+                'warning',
+                ['exception' => $exception::class],
+            ));
+        }
+
+        $validation = $ranking->validateAgainst(array_map(
+            static fn(Candidate $candidate): string => $candidate->id,
+            $base->candidates,
+        ));
+
+        if (!$validation->accepted || $validation->ranking === null) {
+            return $this->withDiagnostic($base, new Diagnostic(
+                'ai_unknown_candidate_id',
+                'AI ranking referenced a candidate that was not supplied by the provider.',
+                'warning',
+                ['candidate_ids' => $validation->unknownCandidateIds],
+            ));
+        }
+
+        $validatedRanking = $validation->ranking;
+        $top = $validatedRanking->top();
+        if ($top === null || !$validatedRanking->canAutoSelect(
+            $this->policy->autoResolveThreshold,
+            $this->policy->ambiguityMargin,
+        )) {
+            return $this->withDiagnostic($base, new Diagnostic(
+                'ai_rank_not_confident',
+                'AI ranking was validated but did not pass the resolution policy.',
+                'info',
+            ));
+        }
+
+        $candidate = null;
+        foreach ($base->candidates as $possibleCandidate) {
+            if ($possibleCandidate->id === $top->candidateId) {
+                $candidate = $possibleCandidate;
+                break;
+            }
+        }
+
+        if ($candidate === null
+            || $candidate->warehouse === null
+            || $candidate->score < $this->policy->minimumCandidateScore
+            || $candidate->warehouse->settlementRef !== $base->settlement->ref) {
+            return $this->withDiagnostic($base, new Diagnostic(
+                'ai_candidate_not_resolvable',
+                'The AI-selected candidate did not pass provider and deterministic validation.',
+                'warning',
+            ));
+        }
+
+        return new ResolutionResult(
+            ResolutionStatus::RESOLVED,
+            $base->settlement,
+            $candidate->warehouse,
+            min($candidate->score, $top->score),
+            $base->candidates,
+            $base->parsedAddress,
+            [...$base->diagnostics, new Diagnostic(
+                'resolved_by_validated_ai_rank',
+                'A known provider candidate passed the AI and deterministic resolution policies.',
+                'info',
+            )],
+            $base->providerName,
+        );
+    }
+
+    private function preferAiResult(ResolutionResult $deterministic, ResolutionResult $aiResult): ResolutionResult
+    {
+        if ($aiResult->isResolved()) {
+            return $aiResult;
+        }
+
+        if ($deterministic->status === ResolutionStatus::NOT_FOUND
+            && $aiResult->status !== ResolutionStatus::NOT_FOUND
+            && $aiResult->status !== ResolutionStatus::PROVIDER_ERROR) {
+            return $aiResult;
+        }
+
+        if ($deterministic->needsReview()
+            && $aiResult->needsReview()
+            && $aiResult->confidence > $deterministic->confidence) {
+            return $aiResult;
+        }
+
+        return $deterministic;
+    }
+
+    private function withDiagnostic(ResolutionResult $result, Diagnostic $diagnostic): ResolutionResult
+    {
+        return new ResolutionResult(
+            $result->status,
+            $result->settlement,
+            $result->warehouse,
+            $result->confidence,
+            $result->candidates,
+            $result->parsedAddress,
+            [...$result->diagnostics, $diagnostic],
+            $result->providerName,
+        );
     }
 
     private function checkProvider(ParsedAddress $parsed): ProviderHealth|ResolutionResult
