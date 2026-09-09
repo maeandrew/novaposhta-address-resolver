@@ -6,6 +6,7 @@ namespace MaeAndrew\NovaPoshtaAddressResolver\AI\DTO;
 
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\AddressInput;
 use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\WarehouseNumber;
 
 final readonly class AiAddressHints
 {
@@ -23,7 +24,7 @@ final readonly class AiAddressHints
         public array $uncertainties = [],
     ) {
         $this->warehouseType = WarehouseType::fromValue($warehouseType);
-        $this->warehouseNumber = self::normalizeNumber($warehouseNumber);
+        $this->warehouseNumber = WarehouseNumber::normalize($warehouseNumber);
         $this->confidence = max(0.0, min(1.0, $confidence));
     }
 
@@ -69,16 +70,4 @@ final readonly class AiAddressHints
         ];
     }
 
-    private static function normalizeNumber(int|string|null $number): ?int
-    {
-        if ($number === null || $number === '') {
-            return null;
-        }
-
-        if (is_int($number)) {
-            return $number >= 0 ? $number : null;
-        }
-
-        return preg_match('/^\d+$/', trim($number)) === 1 ? (int) trim($number) : null;
-    }
 }

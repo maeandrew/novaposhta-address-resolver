@@ -22,10 +22,12 @@ return [
         'store' => null,
         'ttl' => 86400,
         'prefix' => 'novaposhta-address-resolver',
+        'statuses' => ['resolved', 'ambiguous'],
     ],
 
     'events' => [
         'enabled' => true,
+        'dispatch_on_cache' => false,
     ],
 
     'queue' => [

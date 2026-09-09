@@ -22,6 +22,7 @@ final readonly class Settlement
         public string $type = 'city',
         public array $aliases = [],
         public ?array $rawPayload = null,
+        ?TextNormalizer $normalizer = null,
     ) {
         if (trim($this->ref) === '') {
             throw new InvalidArgumentException('Settlement reference cannot be empty.');
@@ -31,9 +32,10 @@ final readonly class Settlement
             throw new InvalidArgumentException('Settlement name cannot be empty.');
         }
 
+        $normalizer ??= TextNormalizer::default();
         $this->normalizedName = $normalizedName !== null && trim($normalizedName) !== ''
-            ? TextNormalizer::default()->normalize($normalizedName)
-            : TextNormalizer::default()->normalize($this->name);
+            ? $normalizer->normalize($normalizedName)
+            : $normalizer->normalize($this->name);
     }
 
     public readonly string $normalizedName;

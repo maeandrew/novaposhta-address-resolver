@@ -6,6 +6,7 @@ namespace MaeAndrew\NovaPoshtaAddressResolver\DTO;
 
 use InvalidArgumentException;
 use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\WarehouseNumber;
 
 final readonly class Warehouse
 {
@@ -34,12 +35,12 @@ final readonly class Warehouse
             throw new InvalidArgumentException('Warehouse name cannot be empty.');
         }
 
-        $this->number = self::normalizeNumber($number);
-        $this->type = WarehouseType::fromValue($type)->value;
+        $this->number = WarehouseNumber::normalize($number);
+        $this->type = WarehouseType::fromValue($type);
     }
 
     public readonly ?int $number;
-    public readonly string $type;
+    public readonly WarehouseType $type;
 
     /**
      * @return array<string, mixed>
@@ -52,7 +53,7 @@ final readonly class Warehouse
             'number' => $this->number,
             'name' => $this->name,
             'address' => $this->address,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'is_active' => $this->isActive,
         ];
 
@@ -63,24 +64,4 @@ final readonly class Warehouse
         return $result;
     }
 
-    private static function normalizeNumber(int|string|null $number): ?int
-    {
-        if ($number === null || $number === '') {
-            return null;
-        }
-
-        if (is_int($number)) {
-            if ($number < 0) {
-                throw new InvalidArgumentException('Warehouse number cannot be negative.');
-            }
-
-            return $number;
-        }
-
-        if (!preg_match('/^\d+$/', trim($number))) {
-            throw new InvalidArgumentException('Warehouse number must contain only digits.');
-        }
-
-        return (int) trim($number);
-    }
 }

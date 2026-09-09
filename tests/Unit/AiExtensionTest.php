@@ -165,4 +165,50 @@ final class AiExtensionTest extends TestCase
         self::assertStringContainsString('[REDACTED_ORDER]', $redacted);
         self::assertStringNotContainsString('user@example.test', $redacted);
     }
+
+    public function testRedactorRemovesParenthesizedPhonesAndLabeledNames(): void
+    {
+        $redacted = (new AddressRedactor())->redact(
+            'Київ, +38 (067) 123-45-67, (050) 123-45-67, ПІБ: Мей Андрій',
+        );
+
+        self::assertSame(2, substr_count($redacted, '[REDACTED_PHONE]'));
+        self::assertStringContainsString('[REDACTED_NAME]', $redacted);
+        self::assertStringNotContainsString('067', $redacted);
+        self::assertStringNotContainsString('Мей Андрій', $redacted);
+    }
+
+    public function testRedactorCanRemoveHostProvidedNamesWithoutGuessingCities(): void
+    {
+        $redacted = (new AddressRedactor(['Мей Андрій']))->redact('Мей Андрій, Київ, відділення 285');
+
+        self::assertStringNotContainsString('Мей Андрій', $redacted);
+        self::assertStringContainsString('Київ', $redacted);
+    }
+
+    public function testStructuredInterpreterComposesStructuredInputForAi(): void
+    {
+        $provider = new FakeStructuredAiProvider([
+            'parse_address' => [
+                'city' => 'Київ',
+                'region' => null,
+                'district' => null,
+                'warehouse_type' => 'branch',
+                'warehouse_number' => 285,
+                'warehouse_text' => 'відділення 285',
+                'confidence' => 0.96,
+                'uncertainties' => [],
+            ],
+        ]);
+
+        (new StructuredAddressAiInterpreter($provider))->parse(new AddressInput(
+            raw: '',
+            city: 'Київ',
+            warehouse: 'відділення',
+            warehouseNumber: 285,
+        ));
+
+        self::assertStringContainsString('Київ', $provider->calls[0]->userText);
+        self::assertStringContainsString('285', $provider->calls[0]->userText);
+    }
 }

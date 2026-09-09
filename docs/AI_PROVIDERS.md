@@ -4,10 +4,12 @@
 
 ## Principle
 
-The resolver must work without AI. AI is a replaceable service used only when
-deterministic parsing/matching cannot produce a sufficiently confident result.
-The Nova Poshta provider remains the source of truth for all settlement and
-warehouse references.
+AI is the recommended quality layer for production free-form address input. It
+helps with typos, mixed Ukrainian/Russian text, missing labels, and irregular
+messages. The resolver must still have a deterministic fallback for provider
+outages, privacy restrictions, offline processing, and tests, so the framework-
+free core remains usable without an AI SDK or API key. The Nova Poshta provider
+remains the source of truth for all settlement and warehouse references.
 
 ## Two interfaces, two responsibilities
 
@@ -126,7 +128,9 @@ Rules:
 
 ## Cost and privacy controls
 
-- AI is disabled by default in the core.
+- The core has no AI dependency and keeps AI disabled unless the host configures
+  an interpreter; production applications should explicitly configure this
+  quality layer and its budget.
 - Add configurable timeout, retry count, model, maximum output tokens, and
   request budget.
 - Cache only normalized, redacted requests; make caching opt-in for sensitive

@@ -103,19 +103,8 @@ class BalancedMatchingStrategy implements MatchingStrategy
             return [0.0, ['type' => 0.0]];
         }
 
-        if ($query->warehouseNumber !== null) {
-            $numberScore = $warehouse->number === $query->warehouseNumber ? 1.0 : 0.0;
-
-            if ($numberScore === 0.0) {
-                return [0.0, ['number' => 0.0]];
-            }
-
-            $typeScore = $query->warehouseType === WarehouseType::UNKNOWN ? 0.95 : 1.0;
-
-            return [$typeScore, ['number' => $numberScore, 'type' => $typeScore]];
-        }
-
-        $typeScore = $query->warehouseType === WarehouseType::UNKNOWN ? 0.25 : 0.45;
+        $hasType = $query->warehouseType !== WarehouseType::UNKNOWN;
+        $typeScore = $hasType ? 1.0 : 0.0;
         $addressScore = $query->streetAddress === null
             ? 0.0
             : max(
@@ -129,12 +118,45 @@ class BalancedMatchingStrategy implements MatchingStrategy
                 $this->similarity->score($query->warehouseText, $warehouse->address),
             );
 
-        $addressWeight = $query->warehouseType === WarehouseType::UNKNOWN ? 0.75 : 0.55;
-        $textWeight = 1.0 - $addressWeight;
-        $score = $typeScore + ($addressScore * $addressWeight) + ($textScore * $textWeight * 0.1);
+        $hasNumber = $query->warehouseNumber !== null;
+        $hasAddress = $query->streetAddress !== null;
+        $hasText = $query->warehouseText !== null;
+
+        if (!$hasNumber && !$hasType && !$hasAddress && !$hasText) {
+            return [0.0, ['number' => 0.0, 'type' => 0.0, 'address' => 0.0, 'text' => 0.0]];
+        }
+
+        $numberScore = $hasNumber && $warehouse->number === $query->warehouseNumber ? 1.0 : 0.0;
+
+        if ($hasNumber && $numberScore === 0.0) {
+            return [0.0, ['number' => 0.0, 'type' => $hasType ? 0.0 : 0.0]];
+        }
+
+        if ($hasNumber) {
+            $numberWeight = $hasAddress ? 0.65 : ($hasText ? 0.80 : ($hasType ? 0.90 : 1.0));
+            $addressWeight = $hasAddress ? ($hasText ? 0.20 : 0.25) : 0.0;
+            $textWeight = $hasText ? ($hasAddress ? 0.05 : ($hasType ? 0.10 : 0.20)) : 0.0;
+            $typeWeight = $hasType ? max(0.0, 1.0 - $numberWeight - $addressWeight - $textWeight) : 0.0;
+        } elseif ($hasAddress) {
+            $addressWeight = $hasType ? ($hasText ? 0.55 : 0.65) : ($hasText ? 0.75 : 0.80);
+            $textWeight = $hasText ? ($hasType ? 0.10 : 0.25) : 0.0;
+            $typeWeight = $hasType ? max(0.0, 1.0 - $addressWeight - $textWeight) : 0.0;
+            $numberWeight = 0.0;
+        } else {
+            $numberWeight = 0.0;
+            $addressWeight = 0.0;
+            $textWeight = $hasText ? ($hasType ? 0.45 : 1.0) : 0.0;
+            $typeWeight = $hasType ? max(0.0, 1.0 - $textWeight) : 0.0;
+        }
+
+        $score = ($numberScore * $numberWeight)
+            + ($typeScore * $typeWeight)
+            + ($addressScore * $addressWeight)
+            + ($textScore * $textWeight);
 
         return [min(1.0, $score), [
-            'type' => $query->warehouseType === WarehouseType::UNKNOWN ? 0.0 : 1.0,
+            'number' => $numberScore,
+            'type' => $typeScore,
             'address' => $addressScore,
             'text' => $textScore,
         ]];
@@ -156,6 +178,6 @@ class BalancedMatchingStrategy implements MatchingStrategy
     {
         $value = trim($value);
 
-        return (string) preg_replace('/^(?:м|місто|с|село)\s+/u', '', $value);
+        return (string) preg_replace('/^(?:м|місто|с|село|смт|селище|с-ще|пгт)\.?\s+/u', '', $value);
     }
 }

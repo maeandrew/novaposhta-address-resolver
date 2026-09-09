@@ -6,9 +6,8 @@ Standalone PHP tooling for turning a free-form Nova Poshta address into a
 validated settlement and warehouse selection.
 
 The project is intentionally split into a framework-free resolver core and
-optional adapters. A user may connect a ready Nova Poshta SDK, write a custom
-HTTP client, use deterministic matching only, or add one of several AI
-providers.
+optional adapters. A user may connect a ready Nova Poshta SDK or a custom HTTP
+client, then add an AI provider without coupling the core to a vendor SDK.
 
 > Unofficial community project. It is not affiliated with Nova Poshta.
 
@@ -119,8 +118,9 @@ the resolver exposes them as `provider_error` instead of treating an outage as
 objects. It must not trust a reference supplied by an AI or by an unvalidated
 caller.
 
-The built-in parser recognizes Ukrainian forms such as `м.`, `відд.`,
-`відділення`, `поштомат`, `пункт`, `№`, and `НП`. Matching is configurable:
+The built-in parser recognizes Ukrainian and common Russian forms such as `м.`,
+`відд.`, `відділення`, `поштомат`, `пункт`, `№`, `НП`, and spoken warehouse
+numbers such as `двісті вісімдесят п’ять`. Matching is configurable:
 
 ```php
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\ResolutionPolicy;
@@ -140,12 +140,19 @@ $resolver = new AddressResolver(
 references, names, types, numbers, and address fields. `SuggestMatchingStrategy`
 returns ranked candidates while keeping the result reviewable.
 
-## AI is optional
+## AI is recommended for production input
 
-The deterministic pipeline works without an AI key. The core AI contracts and a
-fake provider are included in the core package. An AI suggestion may only rank
-provider candidates; it can never create or persist a settlement or warehouse
-reference.
+For production free-form messages, AI should be treated as the primary quality
+layer. It handles spelling mistakes, mixed languages, omitted labels, and
+unusual formats that deterministic parsing cannot cover as well. The
+deterministic pipeline remains a safe degraded mode for outages, privacy-
+restricted inputs, offline jobs, and tests, so the core package does not force
+an AI SDK or API key.
+
+The core AI contracts and a fake provider are included in the core package. An
+AI suggestion may only rank provider candidates; it can never create or persist
+a settlement or warehouse reference. Configure a fallback chain when more than
+one provider is available.
 
 The optional OpenAI adapter uses the Responses API and structured JSON output:
 

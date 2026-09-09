@@ -4,8 +4,11 @@
 
 ## Принцип
 
-Resolver працює без AI. AI є замінним сервісом для випадків, коли
-детермінований parser або matcher не дає достатньої впевненості. Provider Нової
+Для production-ввідних даних AI є рекомендованим шаром якості. Він краще
+обробляє одруки, змішані українську та російську, пропущені назви полів і
+нестандартні повідомлення. Детермінований pipeline залишається fallback для
+збоїв provider-а, обмежень приватності, offline-обробки й тестів, тому
+framework-free core технічно працює без AI SDK або API key. Provider Нової
 пошти залишається єдиним джерелом settlement і warehouse references.
 
 ## Два контракти
@@ -89,7 +92,8 @@ result із diagnostic; помилка AI не маскується під `not_
 
 ## Приватність і вартість
 
-- AI вимкнений за замовчуванням.
+- Core не має AI dependency і не вмикає AI без конфігурації host-застосунку;
+  для production слід явно налаштувати цей шар якості та його budget.
 - Timeout, retries, model, output tokens і budget мають бути налаштованими.
 - Перед запитом треба redacted phone numbers, emails, order IDs та сторонні
   fragments.

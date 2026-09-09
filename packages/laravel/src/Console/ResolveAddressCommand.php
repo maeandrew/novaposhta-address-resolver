@@ -6,6 +6,7 @@ namespace MaeAndrew\NovaPoshtaAddressResolver\Laravel\Console;
 
 use Illuminate\Console\Command;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\AddressInput;
+use MaeAndrew\NovaPoshtaAddressResolver\Enums\ResolutionStatus;
 use MaeAndrew\NovaPoshtaAddressResolver\Laravel\AddressResolutionService;
 
 final class ResolveAddressCommand extends Command
@@ -37,7 +38,7 @@ final class ResolveAddressCommand extends Command
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
             ));
 
-            return self::SUCCESS;
+            return $this->exitCode($result->status);
         }
 
         $this->line('Status: ' . $result->status->value);
@@ -59,6 +60,17 @@ final class ResolveAddressCommand extends Command
             $this->comment('Dry run: this package does not persist host models.');
         }
 
-        return self::SUCCESS;
+        return $this->exitCode($result->status);
+    }
+
+    private function exitCode(ResolutionStatus $status): int
+    {
+        return match ($status) {
+            ResolutionStatus::RESOLVED => self::SUCCESS,
+            ResolutionStatus::PROVIDER_ERROR => self::FAILURE,
+            ResolutionStatus::AMBIGUOUS,
+            ResolutionStatus::NOT_FOUND,
+            ResolutionStatus::INVALID_INPUT => self::INVALID,
+        };
     }
 }

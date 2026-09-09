@@ -6,6 +6,17 @@ All notable changes to the Laravel bridge are documented here.
 
 - Continue compatibility and documentation review.
 
+## [0.4.0] - 2026-09-10
+
+- Added Laravel 11, 12, and 13 support on PHP 8.2+ with a PHP 8.2/8.3 CI
+  matrix.
+- Cache only `resolved` and `ambiguous` results by default; configurable cache
+  statuses remain available for host freshness policies.
+- Added optional event dispatching for cache hits.
+- Returned nonzero Artisan exit codes for review, not-found, invalid-input,
+  and provider-error results.
+- Removed the unused `SerializesModels` trait from the DTO-only queue job.
+
 ## [0.3.1] - 2026-09-10
 
 - Allowed installation with both the current core `0.3.x` line and the earlier

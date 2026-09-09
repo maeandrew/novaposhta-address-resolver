@@ -19,4 +19,15 @@ final class CommandTest extends TestCase
             ->expectsOutputToContain('"status": "resolved"')
             ->assertExitCode(0);
     }
+
+    #[Test]
+    public function it_returns_a_nonzero_code_when_manual_review_is_required(): void
+    {
+        $this->artisan('novaposhta:resolve', [
+            'address' => 'Київ',
+            '--json' => true,
+        ])
+            ->expectsOutputToContain('"status": "ambiguous"')
+            ->assertExitCode(2);
+    }
 }

@@ -41,34 +41,42 @@ final class OpenAiStructuredAiProvider implements StructuredAiProvider
     public function generate(StructuredPrompt $prompt): StructuredAiResponse
     {
         $startedAt = microtime(true);
-        $payload = [
-            'model' => $this->model,
-            'input' => [
-                [
-                    'role' => 'system',
-                    'content' => [
-                        ['type' => 'input_text', 'text' => $prompt->systemInstruction],
-                    ],
-                ],
-                [
-                    'role' => 'user',
-                    'content' => [
-                        ['type' => 'input_text', 'text' => $prompt->userText],
-                    ],
-                ],
-            ],
-            'text' => [
-                'format' => [
-                    'type' => 'json_schema',
-                    'name' => $prompt->schemaName,
-                    'strict' => true,
-                    'schema' => $prompt->schema,
-                ],
-            ],
-            'store' => $this->store,
-        ];
 
         try {
+            $payload = [
+                'model' => $this->model,
+                'input' => [
+                    [
+                        'role' => 'system',
+                        'content' => [
+                            ['type' => 'input_text', 'text' => $prompt->systemInstruction],
+                        ],
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'input_text', 'text' => $prompt->userText],
+                            [
+                                'type' => 'input_text',
+                                'text' => "Structured context:\n" . json_encode(
+                                    $prompt->payload,
+                                    JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+                                ),
+                            ],
+                        ],
+                    ],
+                ],
+                'text' => [
+                    'format' => [
+                        'type' => 'json_schema',
+                        'name' => $prompt->schemaName,
+                        'strict' => true,
+                        'schema' => $prompt->schema,
+                    ],
+                ],
+                'store' => $this->store,
+            ];
+
             $request = $this->requestFactory
                 ->createRequest('POST', $this->endpoint)
                 ->withHeader('Authorization', 'Bearer ' . $this->apiKey)

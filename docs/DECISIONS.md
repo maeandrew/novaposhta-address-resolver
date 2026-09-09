@@ -27,10 +27,13 @@ insufficient. It does not silently pick the first API result.
 
 **Reason:** a wrong delivery branch is more expensive than a short manual review.
 
-## D004 — AI is optional and pluggable
+## D004 — AI is recommended and pluggable
 
-Deterministic parsing and matching are the default. Structured AI providers are
-registered through an interface and may be chained with explicit fallback rules.
+AI is the recommended quality layer for production free-form input, especially
+when messages contain typos, mixed languages, or missing labels. The
+deterministic pipeline remains a required fallback for outages, privacy limits,
+offline work, and tests. Structured AI providers are registered through an
+interface and may be chained with explicit fallback rules.
 
 **Reason:** installations differ in provider availability, cost, privacy policy,
 and model preference.
@@ -80,10 +83,10 @@ package can later add a separate SDK adapter without changing core contracts.
 
 ## D010 — Laravel integration is a separate package
 
-Laravel support lives in `packages/laravel` and targets Laravel 13 with PHP
-8.3+. It binds the core resolver through the container, while cache, events,
-queue jobs, and Artisan commands remain optional integration services. Host
-applications own persistence and model mapping. The published package is
+Laravel support lives in `packages/laravel` and supports Laravel 11, 12, and 13
+on PHP 8.2+. It binds the core resolver through the container, while cache,
+events, queue jobs, and Artisan commands remain optional integration services.
+Host applications own persistence and model mapping. The published package is
 `maeandrew/novaposhta-address-resolver-laravel`.
 
 **Reason:** framework upgrades and application schemas should not change the

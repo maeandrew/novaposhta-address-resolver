@@ -8,6 +8,7 @@ use MaeAndrew\NovaPoshtaAddressResolver\AI\Contracts\AddressAiInterpreter;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\AddressParser;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\LocationProvider;
 use MaeAndrew\NovaPoshtaAddressResolver\Contracts\MatchingStrategy;
+use MaeAndrew\NovaPoshtaAddressResolver\Contracts\SuggestionOnlyMatchingStrategy;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\AddressInput;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\AddressQuery;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\Candidate;
@@ -26,6 +27,7 @@ use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
 use MaeAndrew\NovaPoshtaAddressResolver\Exceptions\InvalidProviderResponseException;
 use MaeAndrew\NovaPoshtaAddressResolver\Matching\BalancedMatchingStrategy;
 use MaeAndrew\NovaPoshtaAddressResolver\Parsing\UkrainianAddressParser;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\TextNormalizer;
 use Throwable;
 
 final class AddressResolver
@@ -33,6 +35,7 @@ final class AddressResolver
     private readonly AddressParser $parser;
     private readonly MatchingStrategy $matchingStrategy;
     private readonly ResolutionPolicy $policy;
+    private readonly TextNormalizer $normalizer;
 
     public function __construct(
         private readonly LocationProvider $locationProvider,
@@ -40,9 +43,11 @@ final class AddressResolver
         ?MatchingStrategy $matchingStrategy = null,
         ?ResolutionPolicy $policy = null,
         private readonly ?AddressAiInterpreter $aiInterpreter = null,
+        ?TextNormalizer $normalizer = null,
     ) {
-        $this->parser = $parser ?? new UkrainianAddressParser();
-        $this->matchingStrategy = $matchingStrategy ?? new BalancedMatchingStrategy();
+        $this->normalizer = $normalizer ?? TextNormalizer::default();
+        $this->parser = $parser ?? new UkrainianAddressParser($this->normalizer);
+        $this->matchingStrategy = $matchingStrategy ?? new BalancedMatchingStrategy($this->normalizer);
         $this->policy = $policy ?? new ResolutionPolicy();
     }
 
@@ -80,7 +85,7 @@ final class AddressResolver
             );
         }
 
-        $query = AddressQuery::fromParsed($parsed);
+        $query = AddressQuery::fromParsed($parsed, $this->normalizer);
         $health = $this->checkProvider($parsed);
 
         if ($health instanceof ResolutionResult) {
@@ -206,7 +211,7 @@ final class AddressResolver
                 );
             }
 
-            $suggestionOnly = method_exists($this->matchingStrategy, 'isSuggestionOnly')
+            $suggestionOnly = $this->matchingStrategy instanceof SuggestionOnlyMatchingStrategy
                 && $this->matchingStrategy->isSuggestionOnly();
 
             if (!$suggestionOnly && $this->policy->canAutoResolve($warehouseMatches)) {

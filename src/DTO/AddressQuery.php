@@ -6,6 +6,7 @@ namespace MaeAndrew\NovaPoshtaAddressResolver\DTO;
 
 use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
 use MaeAndrew\NovaPoshtaAddressResolver\Support\TextNormalizer;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\WarehouseNumber;
 
 final readonly class AddressQuery
 {
@@ -29,8 +30,9 @@ final readonly class AddressQuery
         ?string $streetAddress = null,
         ?string $settlementRef = null,
         ?string $warehouseRef = null,
+        ?TextNormalizer $normalizer = null,
     ) {
-        $normalizer = TextNormalizer::default();
+        $normalizer ??= TextNormalizer::default();
         $this->city = $normalizer->normalize($city);
         $this->region = self::normalizeNullable($normalizer, $region);
         $this->district = self::normalizeNullable($normalizer, $district);
@@ -42,7 +44,7 @@ final readonly class AddressQuery
         $this->warehouseRef = self::normalizeNullable($normalizer, $warehouseRef, false);
     }
 
-    public static function fromParsed(ParsedAddress $parsed): self
+    public static function fromParsed(ParsedAddress $parsed, ?TextNormalizer $normalizer = null): self
     {
         return new self(
             city: $parsed->city,
@@ -54,6 +56,7 @@ final readonly class AddressQuery
             streetAddress: $parsed->streetAddress,
             settlementRef: $parsed->settlementRef,
             warehouseRef: $parsed->warehouseRef,
+            normalizer: $normalizer,
         );
     }
 
@@ -100,14 +103,6 @@ final readonly class AddressQuery
 
     private static function normalizeNumber(int|string|null $number): ?int
     {
-        if ($number === null || $number === '') {
-            return null;
-        }
-
-        if (is_int($number)) {
-            return $number >= 0 ? $number : null;
-        }
-
-        return preg_match('/^\d+$/', trim($number)) === 1 ? (int) trim($number) : null;
+        return WarehouseNumber::normalize($number);
     }
 }

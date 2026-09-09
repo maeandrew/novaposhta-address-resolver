@@ -41,8 +41,12 @@ final class StrictMatchingStrategy extends BalancedMatchingStrategy
             return [$score, ['reference' => $score]];
         }
 
+        if (!$query->hasWarehouseHint()) {
+            return [0.0, ['type' => 0.0, 'number' => 0.0, 'address' => 0.0]];
+        }
+
         $typeMatches = $query->warehouseType === WarehouseType::UNKNOWN
-            || WarehouseType::fromValue($warehouse->type) === $query->warehouseType;
+            || $warehouse->type === $query->warehouseType;
         $numberMatches = $query->warehouseNumber === null || $query->warehouseNumber === $warehouse->number;
         $addressMatches = $query->streetAddress === null
             || $this->similarity->score($query->streetAddress, $warehouse->address) === 1.0;

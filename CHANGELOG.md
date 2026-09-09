@@ -9,6 +9,25 @@ use the `vMAJOR.MINOR.PATCH` form.
 
 - Continue M4 polish and release hardening.
 
+## [0.4.0] - 2026-09-10
+
+- Fixed candidate context delivery in the OpenAI ranking request.
+- Reworked warehouse scoring so a matching number cannot override a conflicting
+  street address, and warehouse text contributes meaningful evidence.
+- Replaced unsafe substring similarity with whole-token matching and
+  typo-tolerant Unicode edit distance.
+- Added Ukrainian and Russian spoken warehouse-number parsing, inverted
+  region/city order handling, `смт` settlement prefixes, and street-house
+  number safeguards.
+- Added phone redaction for parenthesized Ukrainian formats and configurable
+  host-provided name redaction.
+- Added injectable normalization and consistent warehouse-number validation.
+- Stored `Warehouse::$type` as `WarehouseType` and kept serialized output
+  backward-compatible.
+- Extended the Laravel bridge to Laravel 11, 12, and 13 on PHP 8.2+, avoided
+  caching transient negative results by default, added cache-hit event opt-in,
+  and returned meaningful Artisan exit codes.
+
 ## [0.3.1] - 2026-09-10
 
 - Kept optional adapter constraints compatible with both core `0.2.x` and

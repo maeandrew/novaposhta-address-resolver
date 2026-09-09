@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MaeAndrew\NovaPoshtaAddressResolver\DTO;
 
-use InvalidArgumentException;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\WarehouseNumber;
 
 final readonly class AddressInput
 {
@@ -42,6 +42,27 @@ final readonly class AddressInput
             || self::hasText($this->warehouseRef);
     }
 
+    public function asText(): string
+    {
+        if (trim($this->raw) !== '') {
+            return $this->raw;
+        }
+
+        $parts = [];
+
+        foreach ([$this->city, $this->region, $this->district, $this->warehouse, $this->postalCode] as $part) {
+            if ($part !== null && trim($part) !== '') {
+                $parts[] = trim($part);
+            }
+        }
+
+        if ($this->warehouseNumber !== null) {
+            $parts[] = (string) $this->warehouseNumber;
+        }
+
+        return implode(', ', $parts);
+    }
+
     /**
      * @return array<string, int|string|null>
      */
@@ -67,22 +88,6 @@ final readonly class AddressInput
 
     private static function normalizeNumber(int|string|null $number): ?int
     {
-        if ($number === null || $number === '') {
-            return null;
-        }
-
-        if (is_int($number)) {
-            if ($number < 0) {
-                throw new InvalidArgumentException('Warehouse number cannot be negative.');
-            }
-
-            return $number;
-        }
-
-        if (!preg_match('/^\d+$/', trim($number))) {
-            throw new InvalidArgumentException('Warehouse number must contain only digits.');
-        }
-
-        return (int) trim($number);
+        return WarehouseNumber::normalize($number);
     }
 }

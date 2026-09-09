@@ -20,10 +20,13 @@ AI та fuzzy matching можуть запропонувати кандидат�
 Коли доказів недостатньо, resolver повертає `ambiguous` із кандидатами для
 ручної перевірки. Він не обирає перший запис API автоматично.
 
-## D004 — AI підключається опційно
+## D004 — AI рекомендований і залишається pluggable
 
-Детермінований pipeline є типовим. Structured AI provider можна підключити або
-використати через fallback chain із явною політикою.
+AI є рекомендованим шаром якості для production-ввідних даних, особливо коли є
+одруки, змішані мови або пропущені назви полів. Детермінований pipeline
+залишається обов’язковим fallback для збоїв, privacy-обмежень, offline-роботи й
+тестів. Structured AI provider реєструється через interface і може працювати у
+fallback chain з явною політикою.
 
 ## D005 — Persistence належить host-застосунку
 
@@ -60,8 +63,8 @@ HTTP-клієнтами. Пізніше можна додати окремий S
 
 ## D010 — Laravel-інтеграція є окремим package
 
-Laravel bridge живе в `packages/laravel` і розрахований на Laravel 13 та PHP
-8.3+. Він підключає core через container, а cache, events, queue jobs і Artisan
+Laravel bridge живе в `packages/laravel` і підтримує Laravel 11, 12 і 13 на PHP
+8.2+. Він підключає core через container, а cache, events, queue jobs і Artisan
 commands залишаються опційними integration services. Persistence та mapping
 моделей належать host-застосунку. Опублікований package має назву
 `maeandrew/novaposhta-address-resolver-laravel`.

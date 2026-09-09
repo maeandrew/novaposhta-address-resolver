@@ -19,7 +19,7 @@ mkdir -p "$local_core_dir"
 cp "${project_root}/composer.json" "$local_core_dir/composer.json"
 cp -R "${project_root}/src" "$local_core_dir/src"
 cp "${package_dir}/composer.json" "$local_manifest"
-composer config repositories.core '{"type":"path","url":"../../var/core-package-laravel","options":{"symlink":false,"versions":{"maeandrew/novaposhta-address-resolver":"0.3.0"}}}' --file="$local_manifest"
+composer config repositories.core '{"type":"path","url":"../../var/core-package-laravel","options":{"symlink":false,"versions":{"maeandrew/novaposhta-address-resolver":"0.4.0"}}}' --file="$local_manifest"
 COMPOSER="$local_manifest" composer update \
     --working-dir="$package_dir" \
     --prefer-dist \

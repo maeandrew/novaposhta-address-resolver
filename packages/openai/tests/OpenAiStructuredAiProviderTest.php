@@ -89,6 +89,31 @@ final class OpenAiStructuredAiProviderTest extends TestCase
         self::assertSame([], $result->data['ranked_candidates']);
     }
 
+    public function testItSendsCandidatePayloadToTheModelWhenRanking(): void
+    {
+        $client = new FakeClient(new Response(
+            200,
+            [],
+            json_encode([
+                'output_text' => '{"ranked_candidates":[],"reason":"none"}',
+            ], JSON_THROW_ON_ERROR),
+        ));
+        $factory = new Psr17Factory();
+        $provider = new OpenAiStructuredAiProvider($client, $factory, $factory, 'test-key');
+
+        $provider->generate(StructuredPrompt::forCandidateRanking('Київ, відділення 285', [[
+            'candidate_id' => 'fixture-kyiv-285',
+            'kind' => 'warehouse',
+            'name' => 'Відділення №285',
+        ]]));
+
+        $requestData = json_decode((string) $client->request?->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $context = $requestData['input'][1]['content'][1]['text'] ?? '';
+
+        self::assertStringContainsString('fixture-kyiv-285', $context);
+        self::assertStringContainsString('Відділення №285', $context);
+    }
+
     public function testItDoesNotExposeResponseBodyOnHttpFailure(): void
     {
         $client = new FakeClient(new Response(429, [], '{"error":"secret provider details"}'));

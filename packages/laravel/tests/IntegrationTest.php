@@ -60,6 +60,20 @@ final class IntegrationTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_cache_not_found_results_by_default(): void
+    {
+        $this->app['config']->set('novaposhta-address-resolver.cache.enabled', true);
+        $service = $this->app->make(AddressResolutionService::class);
+        $input = AddressInput::fromText('Київ, відділення №9999');
+
+        self::assertSame(ResolutionStatus::NOT_FOUND, $service->resolve($input)->status);
+        self::assertSame(ResolutionStatus::NOT_FOUND, $service->resolve($input)->status);
+
+        $provider = $this->app->make(LocationProvider::class);
+        self::assertSame(2, $provider->warehouseSearches);
+    }
+
+    #[Test]
     public function it_dispatches_resolution_events_only_for_fresh_results(): void
     {
         Event::fake();
@@ -72,6 +86,21 @@ final class IntegrationTest extends TestCase
         $reviewResult = $service->resolve(AddressInput::fromText('Київ'));
         self::assertSame(ResolutionStatus::AMBIGUOUS, $reviewResult->status);
         Event::assertDispatched(AddressNeedsReview::class);
+    }
+
+    #[Test]
+    public function it_can_dispatch_events_for_cache_hits_when_configured(): void
+    {
+        $this->app['config']->set('novaposhta-address-resolver.cache.enabled', true);
+        $this->app['config']->set('novaposhta-address-resolver.events.dispatch_on_cache', true);
+        Event::fake();
+        $service = $this->app->make(AddressResolutionService::class);
+        $input = AddressInput::fromText('Київ, відділення №285');
+
+        $service->resolve($input);
+        $service->resolve($input);
+
+        Event::assertDispatchedTimes(AddressResolved::class, 2);
     }
 
     #[Test]

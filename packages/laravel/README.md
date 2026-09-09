@@ -11,8 +11,8 @@ core remains a separate dependency and does not import Laravel classes.
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
-The package targets Laravel 13 and PHP 8.3+. Laravel package discovery
-registers the service provider automatically.
+The package supports Laravel 11, 12, and 13 on PHP 8.2+. Laravel package
+discovery registers the service provider automatically.
 
 When developing this monorepo, run `ddev exec bash scripts/install-laravel.sh`
 to install the bridge against the local core package.
@@ -52,7 +52,10 @@ $result = app(AddressResolutionService::class)->resolve(
 
 Caching is disabled by default. Enable it only after choosing an appropriate
 store and TTL for the host application. Cache keys contain a hash of the input;
-raw messages are not used as cache keys.
+raw messages are not used as cache keys. By default only `resolved` and
+`ambiguous` results are cached. Transient `not_found` and `invalid_input`
+results are resolved again on the next request; the `cache.statuses` option can
+be changed when the host has a different freshness policy.
 
 `AddressResolved` and `AddressNeedsReview` events are dispatched for fresh
 resolutions when events are enabled. Cached results do not dispatch duplicate

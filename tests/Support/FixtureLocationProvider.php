@@ -78,12 +78,12 @@ final class FixtureLocationProvider implements LocationProvider
             $records = array_values(array_filter(
                 $records,
                 static fn(Warehouse $warehouse): bool => $warehouse->number === $query->number
-                    && ($query->type === null || $query->type === 'unknown' || $warehouse->type === $query->type),
+                    && ($query->type === null || $query->type === 'unknown' || $warehouse->type->value === $query->type),
             ));
         } elseif ($query->type !== null && $query->type !== 'unknown') {
             $records = array_values(array_filter(
                 $records,
-                static fn(Warehouse $warehouse): bool => $warehouse->type === $query->type,
+                static fn(Warehouse $warehouse): bool => $warehouse->type->value === $query->type,
             ));
         }
 

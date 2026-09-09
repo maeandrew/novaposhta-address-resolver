@@ -8,7 +8,7 @@ The Laravel bridge is an optional package:
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
-It targets Laravel 13 and PHP 8.3+. The bridge remains separate from the
+It supports Laravel 11, 12, and 13 on PHP 8.2+. The bridge remains separate from the
 framework-free core and does not assume an order model, database table, or
 column name.
 
@@ -42,7 +42,10 @@ an AI interpreter, cache, or queue settings:
 php artisan vendor:publish --tag=novaposhta-address-resolver-config
 ```
 
-Caching is disabled by default. Fresh `resolved` and `ambiguous` results emit
+Caching is disabled by default. By default only `resolved` and `ambiguous`
+results are cached; `not_found` and `invalid_input` are treated as transient.
+The `cache.statuses` option can override this list when the host has a suitable
+freshness policy. Fresh `resolved` and `ambiguous` results emit
 `AddressResolved` and `AddressNeedsReview`; cache hits do not emit duplicates.
 
 ## Queue and command

@@ -406,6 +406,8 @@ addresses may be required.
 - fake AI provider;
 - one real provider adapter (`packages/openai`, PSR HTTP based);
 - fallback and validation tests;
+- AI remains dependency-optional for the core, but is the recommended quality
+  layer for production free-form input;
 - PII redaction.
 
 ### M3 — Laravel bridge

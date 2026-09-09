@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MaeAndrew\NovaPoshtaAddressResolver\DTO;
 
 use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
+use MaeAndrew\NovaPoshtaAddressResolver\Support\WarehouseNumber;
 
 final readonly class ParsedAddress
 {
@@ -31,7 +32,7 @@ final readonly class ParsedAddress
         $this->normalizedRegion = $this->region;
         $this->normalizedDistrict = $this->district;
         $this->warehouseType = WarehouseType::fromValue($warehouseType);
-        $this->warehouseNumber = self::normalizeNumber($warehouseNumber);
+        $this->warehouseNumber = WarehouseNumber::normalize($warehouseNumber);
     }
 
     public readonly WarehouseType $warehouseType;
@@ -61,16 +62,4 @@ final readonly class ParsedAddress
         ];
     }
 
-    private static function normalizeNumber(int|string|null $number): ?int
-    {
-        if ($number === null || $number === '') {
-            return null;
-        }
-
-        if (is_int($number)) {
-            return $number >= 0 ? $number : null;
-        }
-
-        return preg_match('/^\d+$/', trim($number)) === 1 ? (int) trim($number) : null;
-    }
 }

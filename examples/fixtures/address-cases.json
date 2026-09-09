@@ -18,6 +18,15 @@
     }
   },
   {
+    "id": "spoken_branch_number",
+    "input": "Київ, відділення двісті вісімдесят п’ять",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kyiv",
+      "warehouse_ref": "fixture-kyiv-285"
+    }
+  },
+  {
     "id": "bare_branch_number",
     "input": "Київ 133",
     "expected": {

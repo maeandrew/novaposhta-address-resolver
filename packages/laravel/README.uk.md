@@ -11,7 +11,7 @@
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
-Пакет розрахований на Laravel 13 і PHP 8.3+. Laravel package discovery
+Пакет підтримує Laravel 11, 12 і 13 на PHP 8.2+. Laravel package discovery
 зареєструє service provider автоматично.
 
 Під час розробки цього monorepo запустіть `ddev exec bash scripts/install-laravel.sh`,
@@ -52,7 +52,9 @@ $result = app(AddressResolutionService::class)->resolve(
 
 Cache вимкнений за замовчуванням. Увімкніть його лише після вибору відповідного
 store та TTL. У cache key використовується hash input; сирий текст не є самим
-ключем.
+ключем. За замовчуванням зберігаються лише `resolved` та `ambiguous`.
+Тимчасові `not_found` і `invalid_input` повторно резолвляться під час
+наступного запиту; список можна змінити через `cache.statuses`.
 
 Для свіжих resolution можна отримувати `AddressResolved` і
 `AddressNeedsReview`; cache hit не створює дубльованих events.

@@ -27,7 +27,7 @@ final class StructuredAddressAiInterpreter implements AddressAiInterpreter
     public function parse(AddressInput $input): AiAddressHints
     {
         $this->assertAllowed($input);
-        $prompt = StructuredPrompt::forAddressParsing($this->redactor->redact($input->raw));
+        $prompt = StructuredPrompt::forAddressParsing($this->redactor->redact($input->asText()));
         $response = $this->provider->generate($prompt);
 
         return $this->parseHints($response->data);
@@ -49,7 +49,7 @@ final class StructuredAddressAiInterpreter implements AddressAiInterpreter
                     'name' => $record?->name,
                     'address' => $candidate->warehouse?->address,
                     'number' => $candidate->warehouse?->number,
-                    'type' => $candidate->warehouse?->type,
+                    'type' => $candidate->warehouse?->type->value,
                     'region' => $candidate->settlement?->region,
                     'district' => $candidate->settlement?->district,
                 ];
@@ -57,7 +57,7 @@ final class StructuredAddressAiInterpreter implements AddressAiInterpreter
             $candidates,
         );
         $prompt = StructuredPrompt::forCandidateRanking(
-            $this->redactor->redact($input->raw),
+            $this->redactor->redact($input->asText()),
             $compactCandidates,
         );
         $response = $this->provider->generate($prompt);

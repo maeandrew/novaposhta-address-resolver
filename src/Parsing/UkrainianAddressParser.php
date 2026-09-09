@@ -13,19 +13,19 @@ use MaeAndrew\NovaPoshtaAddressResolver\Support\TextNormalizer;
 final class UkrainianAddressParser implements AddressParser
 {
     private readonly TextNormalizer $normalizer;
+    private readonly SpokenNumberParser $spokenNumberParser;
 
-    public function __construct(?TextNormalizer $normalizer = null)
-    {
+    public function __construct(
+        ?TextNormalizer $normalizer = null,
+        ?SpokenNumberParser $spokenNumberParser = null,
+    ) {
         $this->normalizer = $normalizer ?? TextNormalizer::default();
+        $this->spokenNumberParser = $spokenNumberParser ?? new SpokenNumberParser();
     }
 
     public function parse(AddressInput $input): ParsedAddress
     {
-        $source = trim($input->raw);
-
-        if ($source === '') {
-            $source = $this->composeSource($input);
-        }
+        $source = trim($input->asText());
 
         $warehouseType = $this->detectWarehouseType($source, $input->warehouse);
         $warehouseNumber = $input->warehouseNumber ?? $this->detectWarehouseNumber($source, $input->warehouse);
@@ -56,23 +56,6 @@ final class UkrainianAddressParser implements AddressParser
             warehouseRef: $this->nullableTrim($input->warehouseRef),
             warnings: $warnings,
         );
-    }
-
-    private function composeSource(AddressInput $input): string
-    {
-        $parts = [];
-
-        foreach ([$input->city, $input->region, $input->district, $input->warehouse, $input->postalCode] as $part) {
-            if ($part !== null && trim($part) !== '') {
-                $parts[] = trim($part);
-            }
-        }
-
-        if ($input->warehouseNumber !== null) {
-            $parts[] = (string) $input->warehouseNumber;
-        }
-
-        return implode(', ', $parts);
     }
 
     private function detectWarehouseType(string $source, ?string $warehouse): WarehouseType
@@ -114,9 +97,40 @@ final class UkrainianAddressParser implements AddressParser
             }
         }
 
+        $markerPattern = '/(?:№|#|номер|no\.?|n\.?|відділен\w*|відд\.?|отделен\w*|отд\.?|поштомат\w*|постамат\w*|постомат\w*|пункт\w*|пвз|нп|branch|нова\s+пошта|новая\s+почта)\s*/iu';
+
+        if (preg_match_all($markerPattern, $value, $markerMatches, PREG_OFFSET_CAPTURE) !== false) {
+            foreach ($markerMatches[0] as [$marker, $offset]) {
+                $spokenNumber = $this->spokenNumberParser->parsePrefix(
+                    substr($value, $offset + strlen($marker)),
+                );
+
+                if ($spokenNumber !== null) {
+                    return $spokenNumber;
+                }
+            }
+        }
+
+        $fragments = preg_split('/[,;]+/u', $source);
+        $lastFragment = is_array($fragments) ? trim((string) end($fragments)) : '';
+
+        if ($lastFragment !== '' && $this->spokenNumberParser->parse($lastFragment) !== null) {
+            return $this->spokenNumberParser->parse($lastFragment);
+        }
+
         if (!str_contains($source, ',') && !str_contains($source, ';')
+            && !$this->looksLikeStreet($source)
             && preg_match('/(?:^|\s)(\d{1,6})\s*$/u', $source, $matches) === 1) {
             return (int) $matches[1];
+        }
+
+        if (!str_contains($source, ',') && !str_contains($source, ';')
+            && !$this->looksLikeStreet($source)) {
+            $spokenNumber = $this->spokenNumberParser->parseSuffix($source);
+
+            if ($spokenNumber !== null) {
+                return $spokenNumber;
+            }
         }
 
         return null;
@@ -166,7 +180,24 @@ final class UkrainianAddressParser implements AddressParser
             return '';
         }
 
-        $cityPart = preg_split('/[,;]+/u', $source, 2)[0] ?? $source;
+        $fragments = preg_split('/[,;]+/u', $source);
+        $fragments = is_array($fragments)
+            ? array_values(array_filter(array_map('trim', $fragments), static fn(string $part): bool => $part !== ''))
+            : [];
+        $cityPart = $fragments[0] ?? $source;
+
+        if (count($fragments) > 1) {
+            foreach ($fragments as $index => $fragment) {
+                if ($this->looksLikeRegionOrDistrict($fragment)
+                    || $this->looksLikeWarehouse($fragment)
+                    || $this->looksLikeStreet($fragment)) {
+                    continue;
+                }
+
+                $cityPart = $fragment;
+                break;
+            }
+        }
 
         if (!str_contains($source, ',') && !str_contains($source, ';')) {
             $marker = '(?:відділен\w*|відд\.?|отделен\w*|отд\.?|поштомат\w*|постамат\w*|постомат\w*|пункт\w*|пвз|нп|branch|нова\s+пошта|новая\s+почта|філі\w*|филиал\w*)';
@@ -177,12 +208,31 @@ final class UkrainianAddressParser implements AddressParser
             }
         }
 
-        if ($warehouseType === WarehouseType::PICKUP && str_contains($source, ',')) {
-            $cityPart = (preg_split('/[,;]+/u', $source, 2)[0] ?? $source);
+        if (!str_contains($source, ',') && !str_contains($source, ';')
+            && preg_match(
+                '/\b(?:вул\.?|вулиця|ул\.?|улица|просп\.?|проспект|пров\.?|провулок|пер\.?|переулок|пл\.?|площа|площадь)\b/iu',
+                $cityPart,
+                $streetMatch,
+                PREG_OFFSET_CAPTURE,
+            ) === 1) {
+            $cityPart = trim(substr($cityPart, 0, $streetMatch[0][1]));
         }
 
         if ($warehouseNumber !== null && !str_contains($cityPart, ',') && !str_contains($cityPart, ';')) {
             $cityPart = (string) preg_replace('/\s+\d{1,6}\s*$/u', '', $cityPart);
+
+            $spokenSuffix = $this->spokenNumberParser->parseSuffix($cityPart);
+            if ($spokenSuffix !== null) {
+                $tokens = preg_split('/\s+/u', trim($cityPart));
+                if (is_array($tokens)) {
+                    for ($offset = 1, $count = count($tokens); $offset < $count; $offset++) {
+                        if ($this->spokenNumberParser->parse(implode(' ', array_slice($tokens, $offset))) === $spokenSuffix) {
+                            $cityPart = implode(' ', array_slice($tokens, 0, $offset));
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         return $this->normalizeCity($cityPart);
@@ -197,16 +247,16 @@ final class UkrainianAddressParser implements AddressParser
         $parts = preg_split('/[,;]+/u', $source);
 
         if (is_array($parts) && count($parts) > 1) {
-            $addressParts = array_slice($parts, 1);
+            foreach (array_keys($parts) as $index) {
+                if ($index === 0 || !$this->looksLikeStreet((string) $parts[$index])) {
+                    continue;
+                }
 
-            if ($type === WarehouseType::PICKUP && $addressParts !== []) {
-                array_shift($addressParts);
-            }
+                $candidate = trim(implode(', ', array_slice($parts, $index)));
 
-            $candidate = trim(implode(', ', $addressParts));
-
-            if ($candidate !== '' && $this->looksLikeStreet($candidate)) {
-                return $this->normalizer->normalize($candidate);
+                if ($candidate !== '') {
+                    return $this->normalizer->normalize($candidate);
+                }
             }
         }
 
@@ -269,6 +319,19 @@ final class UkrainianAddressParser implements AddressParser
     {
         return preg_match(
             '/\b(?:вул\.?|вулиця|ул\.?|улица|просп\.?|проспект|пров\.?|провулок|пер\.?|переулок|пл\.?|площа|площадь)\b/iu',
+            $value,
+        ) === 1;
+    }
+
+    private function looksLikeRegionOrDistrict(string $value): bool
+    {
+        return preg_match('/(?:область|обл\.?|район|р-н\.?)\b/iu', $value) === 1;
+    }
+
+    private function looksLikeWarehouse(string $value): bool
+    {
+        return preg_match(
+            '/(?:\bвідділен\w*\b|\bвідд\.?\b|\bотделен\w*\b|\bотд\.?\b|\bпоштомат\w*\b|\bпостамат\w*\b|\bпостомат\w*\b|\bпункт\w*\b|\bпвз\b|\bнп\b|\bbranch\b|\bнова\s+пошта\b|\bновая\s+почта\b|\bфілі\w*\b|\bфилиал\w*\b)/iu',
             $value,
         ) === 1;
     }
