@@ -9,8 +9,8 @@
 - `MINOR` — зворотно сумісна нова функціональність.
 - `MAJOR` — зміна або видалення публічного контракту.
 
-План milestone-версій: `v0.1.0` для M0/M1, `v0.2.0` для M2 та `v0.3.0` для
-M3. Перший стабільний API отримає `v1.0.0` після перевірки сумісності.
+Milestone-версії: `v0.1.0` для M0/M1, `v0.2.0` для M2 та `v0.3.0` для M3.
+Перший стабільний API отримає `v1.0.0` після перевірки сумісності.
 
 ## Кроки релізу
 
@@ -26,10 +26,10 @@ M3. Перший стабільний API отримає `v1.0.0` після п�
 
    ```bash
    git add CHANGELOG.md
-   git commit -m "Prepare v0.1.0 release"
-   git tag -a v0.1.0 -m "Release v0.1.0"
+   git commit -m "Prepare v0.3.0 release"
+   git tag -a v0.3.0 -m "Release v0.3.0"
    git push origin main
-   git push origin v0.1.0
+   git push origin v0.3.0
    ```
 
 4. GitHub Actions перевірить тег, повторно запустить matrix на PHP 8.2 та 8.3
@@ -39,8 +39,13 @@ Composer знаходить VCS-пакет за цими тегами. Післ�
 користувачі зможуть виконати:
 
 ```bash
-composer require maeandrew/novaposhta-address-resolver:^0.1
+composer require maeandrew/novaposhta-address-resolver:^0.3
 ```
+
+Laravel bridge публікується з окремого repository як
+`maeandrew/novaposhta-address-resolver-laravel`. Його tag і версія в Packagist
+відповідають релізу core, а Composer dependency залишається framework-free
+core package.
 
 До публікації в Packagist можна додати GitHub repository як Composer VCS
 repository та використовувати ту саму version constraint.

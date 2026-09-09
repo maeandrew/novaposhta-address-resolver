@@ -1,0 +1,53 @@
+{
+    "name": "maeandrew/novaposhta-address-resolver-laravel",
+    "description": "Optional Laravel integration for the Nova Poshta address resolver",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/cache": "^13.0",
+        "illuminate/console": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/queue": "^13.0",
+        "illuminate/support": "^13.0",
+        "maeandrew/novaposhta-address-resolver": "^0.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "orchestra/testbench": "^11.2",
+        "phpstan/phpstan": "^1.12",
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\Laravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\Laravel\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MaeAndrew\\NovaPoshtaAddressResolver\\Laravel\\NovaPoshtaAddressResolverServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "format:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff --ansi",
+        "analyse": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon",
+        "quality": [
+            "@format:check",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

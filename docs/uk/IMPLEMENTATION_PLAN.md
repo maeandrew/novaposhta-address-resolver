@@ -56,8 +56,9 @@ Provider timeout, malformed response або authentication failure стає
   suggest strategies, policy та fixture tests.
 - **M2** — structured AI contract, fake provider, fallback, redaction і
   optional OpenAI adapter через PSR HTTP. AI не може винайти reference.
-- **M3** — optional Laravel manager, config, cache, queue, events і Artisan
-  command. Laravel package не просочується в core.
+- **M3** — окремий optional Laravel package з manager, config, cache, queue,
+  events, Artisan command і host-model mapping example. Laravel package не
+  просочується в core.
 
 ## Тестування та приватність
 

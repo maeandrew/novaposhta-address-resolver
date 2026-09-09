@@ -57,3 +57,14 @@ factory від host-застосунку замість обов’язково�
 Це залишає адаптер малим, придатним до офлайн-тестування та сумісним із різними
 HTTP-клієнтами. Пізніше можна додати окремий SDK-адаптер без зміни контрактів
 ядра.
+
+## D010 — Laravel-інтеграція є окремим package
+
+Laravel bridge живе в `packages/laravel` і розрахований на Laravel 13 та PHP
+8.3+. Він підключає core через container, а cache, events, queue jobs і Artisan
+commands залишаються опційними integration services. Persistence та mapping
+моделей належать host-застосунку.
+
+Це ізолює core від оновлень фреймворку та схем конкретних застосунків. Bridge
+можна буде опублікувати як `maeandrew/novaposhta-address-resolver-laravel` без
+додавання Laravel dependencies до core-користувачів.

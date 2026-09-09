@@ -6,4 +6,5 @@
 - [AI provider architecture](AI_PROVIDERS.md)
 - [Architecture decisions](DECISIONS.md)
 - [Release process](RELEASING.md)
+- [Laravel integration](LARAVEL.md)
 - [Ukrainian documentation](uk/)

@@ -77,3 +77,15 @@ application's client and factories instead of requiring a vendor SDK.
 **Reason:** the adapter remains small, testable offline, and compatible with
 different HTTP clients while the core keeps zero network dependencies. The
 package can later add a separate SDK adapter without changing core contracts.
+
+## D010 — Laravel integration is a separate package
+
+Laravel support lives in `packages/laravel` and targets Laravel 13 with PHP
+8.3+. It binds the core resolver through the container, while cache, events,
+queue jobs, and Artisan commands remain optional integration services. Host
+applications own persistence and model mapping.
+
+**Reason:** framework upgrades and application schemas should not change the
+core package. The bridge can be published as
+`maeandrew/novaposhta-address-resolver-laravel` without adding Laravel
+dependencies to core consumers.

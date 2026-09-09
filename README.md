@@ -181,6 +181,24 @@ $resolver = new AddressResolver(
 The adapter is optional and its tests use a fake HTTP client; CI never calls an
 AI endpoint.
 
+## Optional Laravel bridge
+
+Laravel integration is a separate package and does not add framework classes to
+the core:
+
+```bash
+# after publishing the bridge package
+composer require maeandrew/novaposhta-address-resolver-laravel
+```
+
+It provides service-container bindings, configurable cache, resolution events,
+a queue job, and `novaposhta:resolve`. The host application binds its own
+`LocationProvider` and decides how resolved references are persisted. See the
+[Laravel integration guide](docs/LARAVEL.md).
+
+During monorepo development, use `ddev exec bash scripts/install-laravel.sh` to
+install the bridge against the local core package.
+
 ## Security and limitations
 
 - The core never writes to orders, customers, databases, or caller-owned data.
@@ -207,12 +225,21 @@ ddev composer quality
 The quality command runs PHP CS Fixer, PHPStan, and the complete PHPUnit suite.
 CI runs the same checks on PHP 8.2 and 8.3.
 
+The optional Laravel bridge has its own local dependency setup and quality
+suite:
+
+```bash
+ddev exec bash scripts/install-laravel.sh
+ddev composer quality --working-dir=packages/laravel
+```
+
 ## Documentation
 
 - `AGENTS.md` — handoff rules for implementation agents.
 - `docs/IMPLEMENTATION_PLAN.md` — detailed scope, contracts, algorithm,
   milestones, and acceptance criteria.
 - `docs/AI_PROVIDERS.md` — provider abstraction, adapters, fallback, and privacy.
+- `docs/LARAVEL.md` — optional Laravel bridge, queue, events, cache, and mapping.
 - `examples/` — synthetic provider, AI, and address fixtures; no customer data.
 
 ## License

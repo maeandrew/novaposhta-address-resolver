@@ -176,6 +176,23 @@ $resolver = new AddressResolver(
 Адаптер опційний, а його тести використовують fake HTTP client; CI не робить
 запитів до AI endpoint.
 
+## Опційний Laravel bridge
+
+Laravel-інтеграція є окремим package і не додає framework-класи до core:
+
+```bash
+# після публікації bridge package
+composer require maeandrew/novaposhta-address-resolver-laravel
+```
+
+Вона надає bindings для container, налаштований cache, resolution events,
+queue job і `novaposhta:resolve`. Host-застосунок реєструє власний
+`LocationProvider` і сам визначає, як зберігати знайдені references. Дивіться
+[гайд Laravel-інтеграції](docs/LARAVEL.md).
+
+Під час розробки monorepo встановлюйте bridge разом із локальним core командою
+`ddev exec bash scripts/install-laravel.sh`.
+
 ## Безпека та обмеження
 
 - Ядро не записує дані в замовлення, клієнтів, бази даних або об’єкти caller-а.
@@ -203,6 +220,14 @@ ddev composer quality
 Quality-команда запускає PHP CS Fixer, PHPStan і повний PHPUnit suite. CI
 виконує ті самі перевірки на PHP 8.2 та 8.3.
 
+Опційний Laravel bridge має окреме локальне встановлення залежностей і quality
+suite:
+
+```bash
+ddev exec bash scripts/install-laravel.sh
+ddev composer quality --working-dir=packages/laravel
+```
+
 ## Документація
 
 - [План реалізації українською](docs/uk/IMPLEMENTATION_PLAN.md)
@@ -211,6 +236,7 @@ Quality-команда запускає PHP CS Fixer, PHPStan і повний PH
 - [Синтетичні приклади українською](examples/README.uk.md)
 - [Англійський індекс документації](docs/README.md)
 - [Український індекс документації](docs/README.uk.md)
+- [Laravel integration guide](docs/LARAVEL.md)
 
 ## Ліцензія
 

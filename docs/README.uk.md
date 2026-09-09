@@ -6,4 +6,5 @@
 - [Архітектура AI-провайдерів](uk/AI_PROVIDERS.md) · [English](AI_PROVIDERS.md)
 - [Архітектурні рішення](uk/DECISIONS.md) · [English](DECISIONS.md)
 - [Процес релізу](uk/RELEASING.md) · [English](RELEASING.md)
+- [Laravel integration](LARAVEL.md)
 - [Синтетичні fixtures](../examples/README.uk.md)

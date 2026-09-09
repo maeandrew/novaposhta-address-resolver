@@ -5,6 +5,7 @@
 !/.env.example
 /coverage/
 /build/
+**/build/
 /dist/
 /var/
 /.phpunit.result.cache

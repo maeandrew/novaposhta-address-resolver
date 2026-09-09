@@ -410,7 +410,8 @@ addresses may be required.
 
 ### M3 — Laravel bridge
 
-- manager/drivers, config, cache, queue, events, Artisan command;
+- separate `packages/laravel` package with manager/drivers and config;
+- cache, queue job, resolution events, and Artisan command;
 - Testbench coverage;
 - custom host-model mapping example.
 
