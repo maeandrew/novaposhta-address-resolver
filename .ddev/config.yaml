@@ -1,0 +1,7 @@
+name: novaposhta-address-resolver
+type: php
+docroot: .
+php_version: "8.3"
+webserver_type: generic
+composer_version: "2"
+use_dns_when_possible: true

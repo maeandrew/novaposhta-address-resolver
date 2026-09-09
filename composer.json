@@ -1,0 +1,44 @@
+{
+    "name": "maeandrew/novaposhta-address-resolver",
+    "description": "Framework-free Nova Poshta address resolution core",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/phpstan": "^1.12",
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MaeAndrew\\NovaPoshtaAddressResolver\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "test:unit": "@php vendor/bin/phpunit --configuration phpunit.xml.dist --testsuite unit",
+        "format:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff --ansi",
+        "analyse": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon",
+        "quality": [
+            "@format:check",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

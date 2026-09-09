@@ -1,0 +1,67 @@
+[
+  {
+    "id": "exact_branch_number",
+    "input": "Київ, відділення №285",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kyiv",
+      "warehouse_ref": "fixture-kyiv-285"
+    }
+  },
+  {
+    "id": "abbreviated_branch",
+    "input": "м. Київ НП 285",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kyiv",
+      "warehouse_ref": "fixture-kyiv-285"
+    }
+  },
+  {
+    "id": "postomat",
+    "input": "Львів, поштомат №12345",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-lviv",
+      "warehouse_ref": "fixture-lviv-12345"
+    }
+  },
+  {
+    "id": "pickup_point_with_address",
+    "input": "Ободівка, пункт приймання-видачі, вул. Соборна, 33",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-obodivka",
+      "warehouse_ref": "fixture-obodivka-pickup-1"
+    }
+  },
+  {
+    "id": "city_without_warehouse",
+    "input": "Київ",
+    "expected": {
+      "status": "ambiguous",
+      "settlement_ref": "fixture-kyiv"
+    }
+  },
+  {
+    "id": "unknown_branch",
+    "input": "Київ, відділення №9999",
+    "expected": {
+      "status": "not_found"
+    }
+  },
+  {
+    "id": "unknown_city",
+    "input": "Місто, якого немає в довіднику, відділення 1",
+    "expected": {
+      "status": "not_found"
+    }
+  },
+  {
+    "id": "empty_input",
+    "input": "   ",
+    "expected": {
+      "status": "invalid_input"
+    }
+  }
+]

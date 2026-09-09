@@ -1,0 +1,29 @@
+[
+  {
+    "ref": "fixture-kyiv",
+    "name": "Київ",
+    "normalized_name": "київ",
+    "region": "Київська",
+    "district": "Київський",
+    "type": "city",
+    "aliases": ["м. Київ", "Киев"]
+  },
+  {
+    "ref": "fixture-lviv",
+    "name": "Львів",
+    "normalized_name": "львів",
+    "region": "Львівська",
+    "district": "Львівський",
+    "type": "city",
+    "aliases": ["м. Львів", "Львов"]
+  },
+  {
+    "ref": "fixture-obodivka",
+    "name": "Ободівка",
+    "normalized_name": "ободівка",
+    "region": "Вінницька",
+    "district": "Гайсинський",
+    "type": "village",
+    "aliases": ["с. Ободівка"]
+  }
+]

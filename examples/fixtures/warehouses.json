@@ -1,0 +1,44 @@
+{
+  "fixture-kyiv": [
+    {
+      "ref": "fixture-kyiv-285",
+      "settlement_ref": "fixture-kyiv",
+      "number": 285,
+      "name": "Відділення №285",
+      "address": "проспект Прикладний, 10",
+      "type": "branch",
+      "is_active": true
+    },
+    {
+      "ref": "fixture-kyiv-12",
+      "settlement_ref": "fixture-kyiv",
+      "number": 12,
+      "name": "Відділення №12",
+      "address": "вулиця Тестова, 1",
+      "type": "branch",
+      "is_active": true
+    }
+  ],
+  "fixture-lviv": [
+    {
+      "ref": "fixture-lviv-12345",
+      "settlement_ref": "fixture-lviv",
+      "number": 12345,
+      "name": "Поштомат №12345",
+      "address": "вулиця Демонстраційна, 5",
+      "type": "postomat",
+      "is_active": true
+    }
+  ],
+  "fixture-obodivka": [
+    {
+      "ref": "fixture-obodivka-pickup-1",
+      "settlement_ref": "fixture-obodivka",
+      "number": null,
+      "name": "Пункт приймання-видачі",
+      "address": "вулиця Соборна, 33",
+      "type": "pickup",
+      "is_active": true
+    }
+  ]
+}

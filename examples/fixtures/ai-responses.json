@@ -1,0 +1,65 @@
+[
+  {
+    "id": "parse_abbreviated_branch",
+    "task": "parse_address",
+    "input": "м. Київ НП 285",
+    "response": {
+      "city": "Київ",
+      "region": null,
+      "district": null,
+      "warehouse_type": "branch",
+      "warehouse_number": 285,
+      "warehouse_text": "НП 285",
+      "confidence": 0.96,
+      "uncertainties": []
+    }
+  },
+  {
+    "id": "rank_known_candidate",
+    "task": "rank_candidates",
+    "input": "Київ, відділення номер 285",
+    "allowed_candidate_ids": ["fixture-kyiv-285", "fixture-kyiv-12"],
+    "response": {
+      "ranked_candidates": [
+        {"candidate_id": "fixture-kyiv-285", "score": 0.99},
+        {"candidate_id": "fixture-kyiv-12", "score": 0.12}
+      ],
+      "reason": "Exact city and warehouse number"
+    }
+  },
+  {
+    "id": "hallucinated_reference",
+    "task": "rank_candidates",
+    "input": "Київ, відділення номер 285",
+    "allowed_candidate_ids": ["fixture-kyiv-285", "fixture-kyiv-12"],
+    "response": {
+      "ranked_candidates": [
+        {"candidate_id": "invented-reference", "score": 1.0}
+      ],
+      "reason": "This must be rejected because the ID was not supplied"
+    },
+    "expected": {
+      "accepted": false,
+      "diagnostic": "unknown_candidate_id"
+    }
+  },
+  {
+    "id": "low_confidence",
+    "task": "parse_address",
+    "input": "Київ",
+    "response": {
+      "city": "Київ",
+      "region": null,
+      "district": null,
+      "warehouse_type": "unknown",
+      "warehouse_number": null,
+      "warehouse_text": null,
+      "confidence": 0.41,
+      "uncertainties": ["warehouse_not_provided"]
+    },
+    "expected": {
+      "accepted": false,
+      "status": "ambiguous"
+    }
+  }
+]

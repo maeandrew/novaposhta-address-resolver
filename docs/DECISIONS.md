@@ -1,0 +1,67 @@
+# Architecture decisions
+
+This file records decisions that should remain stable unless a later change is
+documented with its motivation and migration impact.
+
+## D001 — Framework-free core
+
+The resolver domain is a pure PHP package. Laravel, Eloquent, Filament, HTTP
+clients, AI SDKs, and Nova Poshta SDKs are integrations, not core dependencies.
+
+**Reason:** the package must be usable from Laravel, Symfony, a CLI script, or
+a custom application without forcing a framework or vendor client.
+
+## D002 — Provider is the source of truth
+
+AI and fuzzy matching can suggest a candidate, but only a normalized record
+returned by `LocationProvider` can be resolved or persisted.
+
+**Reason:** a model must never invent a city or warehouse reference.
+
+## D003 — Ambiguity is a first-class result
+
+The resolver returns `ambiguous` with candidates and diagnostics when evidence is
+insufficient. It does not silently pick the first API result.
+
+**Reason:** a wrong delivery branch is more expensive than a short manual review.
+
+## D004 — AI is optional and pluggable
+
+Deterministic parsing and matching are the default. Structured AI providers are
+registered through an interface and may be chained with explicit fallback rules.
+
+**Reason:** installations differ in provider availability, cost, privacy policy,
+and model preference.
+
+## D005 — Persistence belongs to the host application
+
+The core returns DTOs and never writes orders, addresses, or audit rows. The
+Laravel package may provide mapping callbacks, jobs, events, and cache, but it
+must not assume a host schema.
+
+**Reason:** order systems use different models and field names.
+
+## D006 — Synthetic fixtures only
+
+Tests and demos use synthetic `fixture-*` references and public-looking example
+text. No real customer or production data is committed.
+
+**Reason:** examples must be safe to publish and deterministic in offline CI.
+
+## D007 — Monorepo during development, split packages at release
+
+Core, Laravel, and optional adapters may be developed together under
+`packages/`, each with its own Composer manifest. They must not import across
+boundaries in the wrong direction. If Packagist publishing is easier with
+separate repositories, split them without changing the public core contracts.
+
+**Reason:** shared development is convenient, while independent installation is
+the public goal.
+
+## D008 — Public package namespace
+
+The development package is published as `maeandrew/novaposhta-address-resolver`
+and uses the `MaeAndrew\\NovaPoshtaAddressResolver` PSR-4 namespace.
+
+**Reason:** the package identity should be attributable to its public maintainer
+while keeping Nova Poshta integration concepts inside the package namespace.
