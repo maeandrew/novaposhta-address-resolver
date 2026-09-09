@@ -6,6 +6,11 @@ All notable changes to the Laravel bridge are documented here.
 
 - Continue compatibility and documentation review.
 
+## [0.3.1] - 2026-09-10
+
+- Allowed installation with both the current core `0.3.x` line and the earlier
+  compatible `0.2.x` line.
+
 ## [0.3.0] - 2026-09-10
 
 - Added the Laravel 13/PHP 8.3 service provider and named driver manager.

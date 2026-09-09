@@ -83,9 +83,9 @@ package can later add a separate SDK adapter without changing core contracts.
 Laravel support lives in `packages/laravel` and targets Laravel 13 with PHP
 8.3+. It binds the core resolver through the container, while cache, events,
 queue jobs, and Artisan commands remain optional integration services. Host
-applications own persistence and model mapping.
+applications own persistence and model mapping. The published package is
+`maeandrew/novaposhta-address-resolver-laravel`.
 
 **Reason:** framework upgrades and application schemas should not change the
-core package. The bridge can be published as
-`maeandrew/novaposhta-address-resolver-laravel` without adding Laravel
+core package. The bridge is published separately without adding Laravel
 dependencies to core consumers.

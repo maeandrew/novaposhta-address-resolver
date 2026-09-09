@@ -187,7 +187,6 @@ Laravel integration is a separate package and does not add framework classes to
 the core:
 
 ```bash
-# after publishing the bridge package
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
@@ -195,6 +194,9 @@ It provides service-container bindings, configurable cache, resolution events,
 a queue job, and `novaposhta:resolve`. The host application binds its own
 `LocationProvider` and decides how resolved references are persisted. See the
 [Laravel integration guide](docs/LARAVEL.md).
+
+The bridge source is published in its [own GitHub repository](https://github.com/maeandrew/novaposhta-address-resolver-laravel)
+and is available on [Packagist](https://packagist.org/packages/maeandrew/novaposhta-address-resolver-laravel).
 
 During monorepo development, use `ddev exec bash scripts/install-laravel.sh` to
 install the bridge against the local core package.

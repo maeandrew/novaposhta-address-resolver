@@ -181,7 +181,6 @@ $resolver = new AddressResolver(
 Laravel-інтеграція є окремим package і не додає framework-класи до core:
 
 ```bash
-# після публікації bridge package
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
@@ -189,6 +188,9 @@ composer require maeandrew/novaposhta-address-resolver-laravel
 queue job і `novaposhta:resolve`. Host-застосунок реєструє власний
 `LocationProvider` і сам визначає, як зберігати знайдені references. Дивіться
 [гайд Laravel-інтеграції](docs/LARAVEL.md).
+
+Bridge опублікований в [окремому GitHub repository](https://github.com/maeandrew/novaposhta-address-resolver-laravel)
+і доступний у [Packagist](https://packagist.org/packages/maeandrew/novaposhta-address-resolver-laravel).
 
 Під час розробки monorepo встановлюйте bridge разом із локальним core командою
 `ddev exec bash scripts/install-laravel.sh`.

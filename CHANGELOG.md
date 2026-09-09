@@ -9,6 +9,13 @@ use the `vMAJOR.MINOR.PATCH` form.
 
 - Continue M4 polish and release hardening.
 
+## [0.3.1] - 2026-09-10
+
+- Kept optional adapter constraints compatible with both core `0.2.x` and
+  `0.3.x`.
+- Fixed DDEV monorepo install scripts to use temporary core package mirrors,
+  avoiding recursive path installs inside nested `vendor` directories.
+
 ## [0.3.0] - 2026-09-10
 
 - Added the optional Laravel 13/PHP 8.3 bridge under `packages/laravel`.
@@ -16,8 +23,8 @@ use the `vMAJOR.MINOR.PATCH` form.
   resolution events, a queue job, and the `novaposhta:resolve` Artisan command.
 - Added an explicit host-owned mapping callback that only runs for resolved
   results; ambiguous results remain available for review.
-- Added offline Orchestra Testbench coverage and a separate Laravel package
-  manifest ready to publish as `maeandrew/novaposhta-address-resolver-laravel`.
+- Added offline Orchestra Testbench coverage and published the separate Laravel
+  package as `maeandrew/novaposhta-address-resolver-laravel`.
 
 ## [0.2.0] - 2026-09-10
 

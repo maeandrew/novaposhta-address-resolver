@@ -10,7 +10,7 @@
         "illuminate/contracts": "^13.0",
         "illuminate/queue": "^13.0",
         "illuminate/support": "^13.0",
-        "maeandrew/novaposhta-address-resolver": "^0.2"
+        "maeandrew/novaposhta-address-resolver": "^0.2 || ^0.3"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.64",

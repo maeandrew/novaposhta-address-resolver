@@ -63,8 +63,8 @@ HTTP-клієнтами. Пізніше можна додати окремий S
 Laravel bridge живе в `packages/laravel` і розрахований на Laravel 13 та PHP
 8.3+. Він підключає core через container, а cache, events, queue jobs і Artisan
 commands залишаються опційними integration services. Persistence та mapping
-моделей належать host-застосунку.
+моделей належать host-застосунку. Опублікований package має назву
+`maeandrew/novaposhta-address-resolver-laravel`.
 
 Це ізолює core від оновлень фреймворку та схем конкретних застосунків. Bridge
-можна буде опублікувати як `maeandrew/novaposhta-address-resolver-laravel` без
-додавання Laravel dependencies до core-користувачів.
+публікується окремо без додавання Laravel dependencies до core-користувачів.

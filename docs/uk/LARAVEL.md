@@ -5,7 +5,6 @@
 Laravel bridge є опційним package:
 
 ```bash
-# після публікації bridge як окремого package
 composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
