@@ -6,6 +6,11 @@ All notable changes to the Laravel bridge are documented here.
 
 - Continue compatibility and documentation review.
 
+## [0.4.1] - 2026-09-10
+
+- Clarified standalone installation through Composer and marked the
+  monorepo-only `scripts/install-laravel.sh` helper explicitly.
+
 ## [0.4.0] - 2026-09-10
 
 - Added Laravel 11, 12, and 13 support on PHP 8.2+ with a PHP 8.2/8.3 CI

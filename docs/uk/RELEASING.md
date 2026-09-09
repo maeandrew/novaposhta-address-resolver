@@ -9,8 +9,9 @@
 - `MINOR` — зворотно сумісна нова функціональність.
 - `MAJOR` — зміна або видалення публічного контракту.
 
-Milestone-версії: `v0.1.0` для M0/M1, `v0.2.0` для M2 та `v0.3.0` для M3.
-Перший стабільний API отримає `v1.0.0` після перевірки сумісності.
+Milestone-версії: `v0.1.0` для M0/M1, `v0.2.0` для M2, `v0.3.0` для M3, а
+лінійка polish-релізів M4 починається з `v0.4.0`. Перший стабільний API
+отримає `v1.0.0` після перевірки сумісності.
 
 ## Кроки релізу
 
@@ -26,10 +27,10 @@ Milestone-версії: `v0.1.0` для M0/M1, `v0.2.0` для M2 та `v0.3.0` 
 
    ```bash
    git add CHANGELOG.md
-   git commit -m "Prepare v0.3.0 release"
-   git tag -a v0.3.0 -m "Release v0.3.0"
+   git commit -m "Prepare v0.4.0 release"
+   git tag -a v0.4.0 -m "Release v0.4.0"
    git push origin main
-   git push origin v0.3.0
+   git push origin v0.4.0
    ```
 
 4. GitHub Actions перевірить тег, повторно запустить matrix на PHP 8.2 та 8.3
@@ -39,7 +40,7 @@ Composer знаходить VCS-пакет за цими тегами. Післ�
 користувачі зможуть виконати:
 
 ```bash
-composer require maeandrew/novaposhta-address-resolver:^0.3
+composer require maeandrew/novaposhta-address-resolver:^0.4
 ```
 
 Laravel bridge публікується з окремого repository як

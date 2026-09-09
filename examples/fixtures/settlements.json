@@ -25,5 +25,41 @@
     "district": "Гайсинський",
     "type": "village",
     "aliases": ["с. Ободівка"]
+  },
+  {
+    "ref": "fixture-ivanivka-vinnytsia",
+    "name": "Іванівка",
+    "normalized_name": "іванівка",
+    "region": "Вінницька",
+    "district": "Хмільницький",
+    "type": "village",
+    "aliases": ["с. Іванівка", "Ивановка"]
+  },
+  {
+    "ref": "fixture-ivanivka-poltava",
+    "name": "Іванівка",
+    "normalized_name": "іванівка",
+    "region": "Полтавська",
+    "district": "Полтавський",
+    "type": "village",
+    "aliases": ["с. Іванівка", "Ивановка"]
+  },
+  {
+    "ref": "fixture-kamianets-podilskyi",
+    "name": "Кам'янець-Подільський",
+    "normalized_name": "кам янець подільський",
+    "region": "Хмельницька",
+    "district": "Кам'янець-Подільський",
+    "type": "city",
+    "aliases": ["м. Кам’янець-Подільський", "Каменец-Подольский"]
+  },
+  {
+    "ref": "fixture-testove",
+    "name": "Тестове",
+    "normalized_name": "тестове",
+    "region": "Синтетична",
+    "district": "Демонстраційний",
+    "type": "town",
+    "aliases": ["смт. Тестове", "с-ще Тестове", "пгт Тестовое"]
   }
 ]

@@ -289,7 +289,11 @@ final class UkrainianAddressParser implements AddressParser
     private function normalizeCity(string $city): string
     {
         $city = trim($city);
-        $city = (string) preg_replace('/^\s*(?:м\.?|місто|г\.?|город|с\.?|село|смт\.?|пгт\.?)\s+/iu', '', $city);
+        $city = (string) preg_replace(
+            '/^\s*(?:м\.?|місто|г\.?|город|с-ще|селище|с\.?|село|смт\.?|пгт\.?)\s+/iu',
+            '',
+            $city,
+        );
         $city = (string) preg_replace('/\s+(?:область|обл\.?)\s*$/iu', '', $city);
 
         return $this->normalizer->normalize($city);

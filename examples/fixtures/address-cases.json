@@ -94,6 +94,47 @@
     }
   },
   {
+    "id": "ambiguous_homonymous_settlement",
+    "input": "Іванівка, відділення 1",
+    "expected": {
+      "status": "ambiguous"
+    }
+  },
+  {
+    "id": "homonymous_settlement_resolved_by_region",
+    "input": "Іванівка, Вінницька область, відділення 1",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-ivanivka-vinnytsia",
+      "warehouse_ref": "fixture-ivanivka-vinnytsia-1"
+    }
+  },
+  {
+    "id": "apostrophe_and_hyphen_settlement",
+    "input": "м. Кам’янець-Подільський, відділення №1",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-kamianets-podilskyi",
+      "warehouse_ref": "fixture-kamianets-podilskyi-1"
+    }
+  },
+  {
+    "id": "settlement_prefix_s_shche",
+    "input": "с-ще Тестове, відділення 1",
+    "expected": {
+      "status": "resolved",
+      "settlement_ref": "fixture-testove",
+      "warehouse_ref": "fixture-testove-1"
+    }
+  },
+  {
+    "id": "inactive_warehouse",
+    "input": "Київ, відділення 404",
+    "expected": {
+      "status": "not_found"
+    }
+  },
+  {
     "id": "empty_input",
     "input": "   ",
     "expected": {

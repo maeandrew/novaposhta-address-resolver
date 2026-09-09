@@ -100,6 +100,36 @@ final class UkrainianAddressParserTest extends TestCase
         self::assertSame(1, $parsed->warehouseNumber);
     }
 
+    public function testItStripsTheSShcheSettlementPrefix(): void
+    {
+        $parsed = (new UkrainianAddressParser())->parse(
+            AddressInput::fromText('с-ще Тестове, відділення 1'),
+        );
+
+        self::assertSame('тестове', $parsed->city);
+        self::assertSame(1, $parsed->warehouseNumber);
+    }
+
+    #[DataProvider('apostropheVariants')]
+    public function testItNormalizesCommonUnicodeApostropheVariants(string $settlement): void
+    {
+        $parsed = (new UkrainianAddressParser())->parse(
+            AddressInput::fromText($settlement . ', відділення 1'),
+        );
+
+        self::assertSame('кам янець подільський', $parsed->city);
+    }
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function apostropheVariants(): iterable
+    {
+        yield 'ascii apostrophe' => ["Кам'янець-Подільський"];
+        yield 'right single quotation mark' => ['Кам’янець-Подільський'];
+        yield 'modifier letter apostrophe' => ['Камʼянець-Подільський'];
+    }
+
     public function testStreetHouseNumberIsNotTreatedAsWarehouseNumber(): void
     {
         $parsed = (new UkrainianAddressParser())->parse(

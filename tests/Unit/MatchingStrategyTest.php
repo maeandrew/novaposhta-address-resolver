@@ -11,6 +11,7 @@ use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
 use MaeAndrew\NovaPoshtaAddressResolver\Matching\BalancedMatchingStrategy;
 use MaeAndrew\NovaPoshtaAddressResolver\Matching\StrictMatchingStrategy;
 use MaeAndrew\NovaPoshtaAddressResolver\Matching\StringSimilarity;
+use MaeAndrew\NovaPoshtaAddressResolver\Tests\Support\FixtureLoader;
 use PHPUnit\Framework\TestCase;
 
 final class MatchingStrategyTest extends TestCase
@@ -87,5 +88,20 @@ final class MatchingStrategyTest extends TestCase
 
         self::assertLessThan(0.65, $similarity->score('Бар', 'Барвінкове'));
         self::assertGreaterThanOrEqual(0.85, $similarity->score('Львив', 'Львів'));
+    }
+
+    public function testRegionEvidenceExceedsTheDefaultAmbiguityMarginForHomonyms(): void
+    {
+        $matches = (new BalancedMatchingStrategy())->match(
+            new AddressQuery(city: 'Іванівка', region: 'Вінницька'),
+            FixtureLoader::settlements(),
+        );
+
+        self::assertSame('fixture-ivanivka-vinnytsia', $matches->top()?->ref);
+        self::assertSame('fixture-ivanivka-poltava', $matches->second()?->ref);
+        self::assertGreaterThanOrEqual(
+            0.08,
+            ($matches->top()?->score ?? 0.0) - ($matches->second()?->score ?? 0.0),
+        );
     }
 }

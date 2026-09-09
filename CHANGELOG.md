@@ -9,6 +9,17 @@ use the `vMAJOR.MINOR.PATCH` form.
 
 - Continue M4 polish and release hardening.
 
+## [0.4.1] - 2026-09-10
+
+- Added homonymous-settlement fixtures with region disambiguation and explicit
+  candidate-preservation tests.
+- Added apostrophe, hyphen, `с-ще`, and inactive-warehouse coverage.
+- Added a reusable abstract `LocationProvider` contract test and a runnable
+  in-memory custom-provider example.
+- Normalized common Unicode apostrophe variants consistently.
+- Clarified standalone Laravel README installation and added an architecture
+  diagram in English and Ukrainian.
+
 ## [0.4.0] - 2026-09-10
 
 - Fixed candidate context delivery in the OpenAI ranking request.

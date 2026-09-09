@@ -5,6 +5,7 @@
 - [Implementation plan](IMPLEMENTATION_PLAN.md)
 - [AI provider architecture](AI_PROVIDERS.md)
 - [Architecture decisions](DECISIONS.md)
+- [Architecture](ARCHITECTURE.md)
 - [Release process](RELEASING.md)
 - [Laravel integration](LARAVEL.md)
 - [Ukrainian documentation](uk/)

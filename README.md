@@ -248,6 +248,7 @@ ddev composer quality --working-dir=packages/laravel
 - `docs/IMPLEMENTATION_PLAN.md` — detailed scope, contracts, algorithm,
   milestones, and acceptance criteria.
 - `docs/AI_PROVIDERS.md` — provider abstraction, adapters, fallback, and privacy.
+- `docs/ARCHITECTURE.md` — core, provider, AI, and Laravel boundaries.
 - `docs/LARAVEL.md` — optional Laravel bridge, queue, events, cache, and mapping.
 - `examples/` — synthetic provider, AI, and address fixtures; no customer data.
 

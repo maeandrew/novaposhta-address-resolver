@@ -59,4 +59,38 @@ final class AddressResolverFixtureTest extends TestCase
         self::assertSame(ResolutionStatus::PROVIDER_ERROR, $result->status);
         self::assertContains('provider_error', $result->diagnosticCodes());
     }
+
+    public function testInactiveWarehouseIsExcludedFromResolution(): void
+    {
+        $provider = new FixtureLocationProvider(
+            FixtureLoader::settlements(),
+            FixtureLoader::warehouses(),
+        );
+        $result = (new AddressResolver($provider))->resolve(
+            AddressInput::fromText('Київ, відділення 404'),
+        );
+
+        self::assertSame(ResolutionStatus::NOT_FOUND, $result->status);
+        self::assertNull($result->warehouse);
+        self::assertContains('inactive_warehouse_skipped', $result->diagnosticCodes());
+    }
+
+    public function testAmbiguousHomonymousSettlementKeepsEveryCandidateForReview(): void
+    {
+        $provider = new FixtureLocationProvider(
+            FixtureLoader::settlements(),
+            FixtureLoader::warehouses(),
+        );
+        $result = (new AddressResolver($provider))->resolve(
+            AddressInput::fromText('Іванівка, відділення 1'),
+        );
+
+        self::assertSame(ResolutionStatus::AMBIGUOUS, $result->status);
+        self::assertNull($result->settlement);
+        self::assertNull($result->warehouse);
+        self::assertSame(
+            ['fixture-ivanivka-poltava', 'fixture-ivanivka-vinnytsia'],
+            array_map(static fn($candidate): string => $candidate->id, $result->candidates),
+        );
+    }
 }

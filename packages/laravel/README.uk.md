@@ -12,10 +12,12 @@ composer require maeandrew/novaposhta-address-resolver-laravel
 ```
 
 Пакет підтримує Laravel 11, 12 і 13 на PHP 8.2+. Laravel package discovery
-зареєструє service provider автоматично.
+зареєструє service provider автоматично. У цьому standalone repository виконайте
+`composer install`, щоб core dependency встановилася з Packagist.
 
-Під час розробки цього monorepo запустіть `ddev exec bash scripts/install-laravel.sh`,
-щоб встановити bridge разом із локальним core package.
+Якщо пакет розробляється всередині батьківського monorepo, запускайте
+`ddev exec bash scripts/install-laravel.sh` із кореня monorepo. Цей helper
+належить батьківському repository і до standalone package не входить.
 
 ## Налаштування provider-а
 

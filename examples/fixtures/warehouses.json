@@ -26,6 +26,15 @@
       "address": "вулиця Тестова, 1",
       "type": "branch",
       "is_active": true
+    },
+    {
+      "ref": "fixture-kyiv-404",
+      "settlement_ref": "fixture-kyiv",
+      "number": 404,
+      "name": "Відділення №404",
+      "address": "вулиця Архівна, 4",
+      "type": "branch",
+      "is_active": false
     }
   ],
   "fixture-lviv": [
@@ -47,6 +56,50 @@
       "name": "Пункт приймання-видачі",
       "address": "вулиця Соборна, 33",
       "type": "pickup",
+      "is_active": true
+    }
+  ],
+  "fixture-ivanivka-vinnytsia": [
+    {
+      "ref": "fixture-ivanivka-vinnytsia-1",
+      "settlement_ref": "fixture-ivanivka-vinnytsia",
+      "number": 1,
+      "name": "Відділення №1",
+      "address": "вулиця Центральна, 1",
+      "type": "branch",
+      "is_active": true
+    }
+  ],
+  "fixture-ivanivka-poltava": [
+    {
+      "ref": "fixture-ivanivka-poltava-1",
+      "settlement_ref": "fixture-ivanivka-poltava",
+      "number": 1,
+      "name": "Відділення №1",
+      "address": "вулиця Центральна, 2",
+      "type": "branch",
+      "is_active": true
+    }
+  ],
+  "fixture-kamianets-podilskyi": [
+    {
+      "ref": "fixture-kamianets-podilskyi-1",
+      "settlement_ref": "fixture-kamianets-podilskyi",
+      "number": 1,
+      "name": "Відділення №1",
+      "address": "вулиця Соборна, 1",
+      "type": "branch",
+      "is_active": true
+    }
+  ],
+  "fixture-testove": [
+    {
+      "ref": "fixture-testove-1",
+      "settlement_ref": "fixture-testove",
+      "number": 1,
+      "name": "Відділення №1",
+      "address": "вулиця Прикладна, 1",
+      "type": "branch",
       "is_active": true
     }
   ]

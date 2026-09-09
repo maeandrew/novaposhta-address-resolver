@@ -242,6 +242,7 @@ ddev composer quality --working-dir=packages/laravel
 
 - [План реалізації українською](docs/uk/IMPLEMENTATION_PLAN.md)
 - [Архітектура AI-провайдерів українською](docs/uk/AI_PROVIDERS.md)
+- [Архітектура core та адаптерів](docs/uk/ARCHITECTURE.md)
 - [Архітектурні рішення українською](docs/uk/DECISIONS.md)
 - [Синтетичні приклади українською](examples/README.uk.md)
 - [Англійський індекс документації](docs/README.md)

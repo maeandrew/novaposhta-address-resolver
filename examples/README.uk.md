@@ -11,6 +11,8 @@
 - `fixtures/ai-responses.json` — structured AI responses, зокрема invalid та
   hallucinated-reference cases, які мають бути відхилені.
 - `offline-demo.php` — runnable resolver example без мережевих запитів.
+- `custom-provider.php` — runnable мінімальна реалізація `LocationProvider`, яку
+  можна замінити адаптером SDK, HTTP-клієнтом або локальним read model.
 
 `fixture-*` references не є реальними references Нової пошти.
 
@@ -18,4 +20,5 @@
 
 ```bash
 ddev exec php examples/offline-demo.php "Київ 133"
+ddev exec php examples/custom-provider.php "Прикладне, відділення 1"
 ```
