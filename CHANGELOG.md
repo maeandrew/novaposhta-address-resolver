@@ -9,6 +9,14 @@ use the `vMAJOR.MINOR.PATCH` form.
 
 - Continue M4 polish and release hardening.
 
+## [0.4.2] - 2026-09-10
+
+- Registered the `tests/Contract` PHPUnit suite so provider contract tests run
+  in local and CI quality checks.
+- Fixed the abstract provider contract test's `WarehouseType` import.
+- Made the fixture provider normalize region and district query values before
+  comparison.
+
 ## [0.4.1] - 2026-09-10
 
 - Added homonymous-settlement fixtures with region disambiguation and explicit

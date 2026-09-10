@@ -8,6 +8,7 @@ use MaeAndrew\NovaPoshtaAddressResolver\Contracts\LocationProvider;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\Settlement;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\SettlementQuery;
 use MaeAndrew\NovaPoshtaAddressResolver\DTO\WarehouseQuery;
+use MaeAndrew\NovaPoshtaAddressResolver\Enums\WarehouseType;
 use PHPUnit\Framework\TestCase;
 
 /**

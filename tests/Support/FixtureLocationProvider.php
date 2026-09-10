@@ -56,8 +56,11 @@ final class FixtureLocationProvider implements LocationProvider
                     return false;
                 }
 
-                return ($query->region === null || $normalizer->normalize((string) $settlement->region) === $query->region)
-                    && ($query->district === null || $normalizer->normalize((string) $settlement->district) === $query->district);
+                $region = $query->region === null ? null : $normalizer->normalize($query->region);
+                $district = $query->district === null ? null : $normalizer->normalize($query->district);
+
+                return ($region === null || $normalizer->normalize((string) $settlement->region) === $region)
+                    && ($district === null || $normalizer->normalize((string) $settlement->district) === $district);
             },
         ));
 
